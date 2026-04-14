@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Animal Bite Center</title>
+    <link rel="stylesheet" href="abtc.css">
+</head>
+<body>
+
+<div id="sideNav" class="sidenav no-print">
+    <a href="javascript:void(0)" class="closebtn" onclick="toggleNav()">&times;</a>
+    <a href="#" onclick="openReportModal()">Financial Tracking</a>
+    <a href="#" onclick="openArchiveModal()">Archive / Deleted Records</a>
+    <a href="#" onclick="openDefaulterLogModal()">Defaulter Logbook</a>
+    <a href="#" onclick="logoutUser()" class="logout-link" style="margin-top:20px;border-top:1px solid #444;">Logout</a>
+</div>
+
+<div id="reportModal" class="modal no-print">
+    <div class="modal-content">
+        <span class="close" onclick="closeReportModal()">&times;</span>
+        <h2 id="modalTitle">FINANCIAL TRACKING</h2>
+        <div id="financeFilterBox" class="form-section-box">
+            <h3 class="section-subtitle">FILTER BY DATE</h3>
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Select Period</label>
+                    <select id="dateRangeFilter" onchange="handleDateRangeChange()">
+                        <option value="all">ALL TIME</option>
+                        <option value="specific">Specific Date</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+                <div class="input-group" id="specificDateGroup" style="display:none;">
+                    <label>Select Date</label>
+                    <input type="date" id="specificDate" onchange="refreshCurrentView()">
+                </div>
+            </div>
+        </div>
+        <div id="financeView">
+            <h3 id="statRevenue">Total: ₱0</h3>
+            <table class="report-table" style="width:100%;border-collapse:collapse;border:1px solid #000;">
+                <thead><tr><th>Vaccine Brand</th><th>Count</th><th>Sub-Total</th></tr></thead>
+                <tbody id="financeReportBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="userModal" class="modal no-print">
+    <div class="modal-content">
+        <span class="close" onclick="closeUserModal()">&times;</span>
+        <h2 class="user-mgmt-title">USER ACCOUNT MANAGEMENT</h2>
+        <div class="form-section-box">
+            <form id="userForm" onsubmit="saveUser(event)">
+                <div class="input-row">
+                    <div class="input-group"><label>First Name</label><input type="text" id="uFName" required></div>
+                    <div class="input-group"><label>Middle Name</label><input type="text" id="uMName"></div>
+                    <div class="input-group"><label>Last Name</label><input type="text" id="uLName" required></div>
+                    <div class="input-group"><label>Username</label><input type="text" id="uUsername" required></div>
+                    <div class="input-group"><label>Password</label><input type="password" id="uPassword" required></div>
+                    <div class="input-group">
+                        <label>Role</label>
+                        <select id="uRole">
+                            <option value="STAFF">STAFF ACCESS</option>
+                            <option value="ADMIN">ADMIN ACCESS</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="primary-btn">CREATE</button>
+                </div>
+            </form>
+        </div>
+        <div id="userFormMsg" style="display:none;margin-bottom:12px;padding:10px 14px;border-radius:6px;font-weight:700;font-size:13px;"></div>
+        <table style="width:100%;margin-top:20px;border-collapse:collapse;text-align:center;" border="1">
+            <thead>
+                <tr>
+                    <th style="padding:12px;text-align:center;background:#1a1a2e;color:#fff;">FULL NAME</th>
+                    <th style="padding:12px;text-align:center;background:#1a1a2e;color:#fff;">USERNAME</th>
+                    <th style="padding:12px;text-align:center;background:#1a1a2e;color:#fff;">ROLE</th>
+                    <th style="padding:12px;text-align:center;background:#1a1a2e;color:#fff;">POSITION</th>
+                    <th style="padding:12px;text-align:center;background:#1a1a2e;color:#fff;">ACTION</th>
+                </tr>
+            </thead>
+            <tbody id="userListBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="archiveModal" class="modal no-print">
+    <div class="modal-content">
+        <span class="close" onclick="closeArchiveModal()">&times;</span>
+        <h3 class="archive-title">ARCHIVED PATIENT RECORDS</h3>
+        <table style="width:100%;border-collapse:collapse;text-align:center;" border="1">
+            <thead><tr>
+                <th style="padding:12px;text-align:center;background:#1a1a2e;color:#fff;">Name</th>
+                <th style="padding:12px;text-align:center;background:#1a1a2e;color:#fff;">Date Deleted</th>
+                <th style="padding:12px;text-align:center;background:#1a1a2e;color:#fff;">Action</th>
+            </tr></thead>
+            <tbody id="archiveBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="container no-print">
+    <div class="main-header">
+        <div style="display:flex;align-items:center;gap:15px;">
+            <div class="burger-menu" onclick="toggleNav()"><div></div><div></div><div></div></div>
+            <h1><span class="logo-a">A</span>nimal <span class="logo-b">B</span>ite <span class="logo-c">C</span>enter</h1>
+        </div>
+        <div class="top-utils">
+            <input type="text" id="searchBar" placeholder="SEARCH PATIENT..." onkeyup="filterTable()">
+            <button onclick="window.location.href='print_records.php'" class="primary-btn" >&#128438; Print All Records</button>
+        </div>
+    </div>
+
+
+    <!-- ACTION BAR -->
+    <div class="action-bar">
+        <button onclick="openPatientModal()" class="register-patient-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Register New Patient
+        </button>
+    </div>
+
+
+    <!-- DASHBOARD SUMMARY CARDS -->
+    <div class="dashboard-cards">
+        <div class="dash-card active" id="cardBtn-all" onclick="setCardFilter('all')">
+            <div class="dash-card-icon" style="background:rgba(79,70,229,0.12);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.3"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="dash-card-info">
+                <span class="dash-card-count" id="cardTotal">0</span>
+                <span class="dash-card-label">Total Patients</span>
+                <span class="dash-card-sub">All time &middot; active records</span>
+            </div>
+        </div>
+        <div class="dash-card" id="cardBtn-pending" onclick="setCardFilter('pending')">
+            <div class="dash-card-icon" style="background:rgba(234,88,12,0.12);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="dash-card-info">
+                <span class="dash-card-count" id="cardPending">0</span>
+                <span class="dash-card-label">Pending Review</span>
+                <span class="dash-card-sub">Needs attention &middot; no Day 0 yet</span>
+            </div>
+        </div>
+        <div class="dash-card" id="cardBtn-treatment" onclick="setCardFilter('treatment')">
+            <div class="dash-card-icon" style="background:rgba(37,99,235,0.12);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.3"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            </div>
+            <div class="dash-card-info">
+                <span class="dash-card-count" id="cardTreatment">0</span>
+                <span class="dash-card-label">In Treatment</span>
+                <span class="dash-card-sub">Active PEP &middot; vaccination ongoing</span>
+            </div>
+        </div>
+        <div class="dash-card" id="cardBtn-completed" onclick="setCardFilter('completed')">
+            <div class="dash-card-icon" style="background:rgba(22,163,74,0.12);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="dash-card-info">
+                <span class="dash-card-count" id="cardCompleted">0</span>
+                <span class="dash-card-label">Completed</span>
+                <span class="dash-card-sub">Full PEP series &middot; outcome: C</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="centered-header">
+        <p>DEPARTMENT OF HEALTH</p>
+        <p>NATIONAL RABIES PREVENTION AND CONTROL PROGRAM</p>
+        <h2>RABIES EXPOSURE REGISTRY</h2>
+    </div>
+
+    <div class="table-responsive">
+        <table id="patientTable">
+            <thead>
+                <tr>
+                    <th colspan="2">Registration</th><th rowspan="2">Patient Name</th><th rowspan="2">Address</th>
+                    <th colspan="6">Exposure History</th><th rowspan="2">Cat</th><th rowspan="2">Wash</th>
+                    <th rowspan="2">RIG</th><th colspan="7">Vaccine Schedule</th><th rowspan="2">Outcome</th>
+                    <th rowspan="2">Animal Status</th><th rowspan="2">Remarks</th><th rowspan="2">Action</th>
+                </tr>
+                <tr>
+                    <th>ID</th><th>Date</th><th>Age</th><th>Sex</th><th>Place of Occurrence</th><th>Animal</th><th>Type</th><th>Body Site</th><th>Route</th><th>D0</th><th>D3</th><th>D7</th><th>D14</th><th>D28</th><th>Brand</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="vaccine-layout">
+        <!-- LEFT: Batch Management (vertical stacked fields) -->
+        <div class="management-section-fixed">
+            <div class="mgmt-header">VACCINE BATCH MANAGEMENT</div>
+            <form id="stockForm">
+                <div class="mgmt-col">
+                    <div class="input-group"><label>Brand Name</label><input type="text" id="vName" required></div>
+                    <div class="input-group"><label>Qty</label><input type="number" id="vQty" required></div>
+                    <div class="input-group"><label>Date Stocked</label><input type="date" id="vDate" required></div>
+                    <div class="input-group"><label>Expiry Date</label><input type="date" id="vExp" required></div>
+                    <div class="input-group"><label>Price</label><input type="number" id="vPrice" required></div>
+                    <div class="mgmt-button-group">
+                        <button type="button" id="stockClearBtn" class="clear-btn" onclick="resetStockForm()">CLEAR</button>
+                        <button type="submit" id="stockSubmitBtn" class="save-btn">SAVE BATCH</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- RIGHT: Stock Monitoring (horizontal table, unchanged) -->
+        <div class="inventory-section-fixed">
+            <h3>VACCINE STOCK MONITORING</h3>
+            <div id="inventoryBody"></div>
+        </div>
+    </div>
+</div>
+
+<!-- PRINT RECEIPT SECTION (unchanged) -->
+<div id="printSection">
+    <div class="receipt-container">
+        <div class="receipt-header">
+            <h1 class="clinic-name">Animal Bite Center</h1>
+            <p class="clinic-subtitle">Rabies Prevention & Treatment Facility</p>
+            <p class="receipt-date" id="currentPrintDate"></p>
+            <p class="receipt-number">Receipt No: <span id="receiptNumber"></span></p>
+        </div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-body">
+            <div class="patient-info-section">
+                <h3 class="section-title">Patient Information</h3>
+                <div class="info-row"><span class="info-label">Name:</span><span class="info-value" id="pName"></span></div>
+                <div class="info-row"><span class="info-label">Date:</span><span class="info-value" id="pDate"></span></div>
+            </div>
+            <div class="receipt-divider"></div>
+            <div class="charges-section">
+                <h3 class="section-title">Service Details</h3>
+                <div class="charge-row"><span class="charge-label">Vaccine Brand:</span><span class="charge-value" id="pBrand"></span></div>
+                <div class="charge-row"><span class="charge-label">Treatment Fee:</span><span class="charge-value" id="pPrice"></span></div>
+                <div class="charge-row"><span class="charge-label">Registered By:</span><span class="charge-value" id="pRegisteredBy"></span></div>
+                <div class="charge-row"><span class="charge-label">Administered By:</span><span class="charge-value" id="pIncharge"></span></div>
+            </div>
+            <div class="receipt-divider"></div>
+            <div class="schedule-section">
+                <h3 class="section-title">Vaccination Schedule</h3>
+                <div class="schedule-grid">
+                    <div class="schedule-item"><span class="day-label">Day 0:</span><span class="day-value" id="r0"></span></div>
+                    <div class="schedule-item"><span class="day-label">Day 3:</span><span class="day-value" id="r3"></span></div>
+                    <div class="schedule-item"><span class="day-label">Day 7:</span><span class="day-value" id="r7"></span></div>
+                    <div class="schedule-item"><span class="day-label">Day 14:</span><span class="day-value" id="r14"></span></div>
+                    <div class="schedule-item"><span class="day-label">Day 28:</span><span class="day-value" id="r28"></span></div>
+                </div>
+            </div>
+            <div class="receipt-divider-thick"></div>
+            <div class="total-section">
+                <div class="total-row"><span class="total-label">TOTAL AMOUNT:</span><span class="total-value" id="pTotalPrice"></span></div>
+            </div>
+        </div>
+        <div class="receipt-footer">
+            <p class="footer-text">Please follow the vaccination schedule strictly.</p>
+            <p class="footer-text">Keep this receipt for your records.</p>
+            <p class="footer-thank">Thank you!</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  PATIENT REGISTRATION / EDIT MODAL                        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="patientModal" class="modal no-print">
+    <div class="modal-content" style="max-width:1100px;">
+        <span class="close" onclick="closePatientModal()">&times;</span>
+        <h2 id="patientModalTitle">REGISTER NEW PATIENT</h2>
+        <form id="biteForm">
+            <div class="form-section-box" style="margin-bottom:16px;">
+                <h3 class="section-subtitle">Patient Information</h3>
+                <div class="input-row">
+                    <div class="input-group"><label>Date of Registration</label><input type="date" id="regDate" required></div>
+                    <div class="input-group"><label>Last Name</label><input type="text" id="lName" required></div>
+                    <div class="input-group"><label>First Name</label><input type="text" id="fName" required></div>
+                    <div class="input-group"><label>Middle Name</label><input type="text" id="mName"></div>
+                    <div class="input-group"><label>Age</label><input type="number" id="age" required></div>
+                    <div class="input-group"><label>Sex</label><select id="sex"><option>M</option><option>F</option></select></div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group" style="flex:2;"><label>Address (Barangay/City)</label><input type="text" id="addr" required></div>
+                    <div class="input-group"><label>Contact No.</label><input type="text" id="contactNo" placeholder="e.g. 09XXXXXXXXX" maxlength="20"></div>
+                </div>
+            </div>
+            <div class="form-section-box" style="margin-bottom:16px;">
+                <h3 class="section-subtitle">Bite / Exposure Details</h3>
+                <div class="input-row">
+                    <div class="input-group"><label>Place of Occurrence</label><input type="text" id="place" required></div>
+                    <div class="input-group"><label>Date of Bite</label><input type="date" id="bDate" required></div>
+                    <div class="input-group"><label>Type of Animal</label><input type="text" id="animal" required></div>
+                    <div class="input-group"><label>Exposure (B/NB)</label><select id="bType"><option>B</option><option>NB</option></select></div>
+                    <div class="input-group"><label>Body Site</label><input type="text" id="site" required></div>
+                    <div class="input-group"><label>Category</label><select id="cat"><option>1</option><option>2</option><option>3</option></select></div>
+                    <div class="input-group"><label>Wash</label><select id="wash"><option>Y</option><option>N</option></select></div>
+                    <div class="input-group"><label>RIG Given</label><input type="date" id="rig"></div>
+                </div>
+            </div>
+            <div class="form-section-box" style="margin-bottom:16px;">
+                <h3 class="section-subtitle">Treatment & Vaccination</h3>
+                <div class="input-row">
+                    <div class="input-group"><label>Vaccine Brand</label><select id="brand" onchange="updatePriceDisplay()" required><option value="">-- SELECT --</option></select></div>
+                    <div class="input-group"><label>Route</label><input type="text" id="route" placeholder="ID/IM"></div>
+                    <div class="input-group"><label>Injection Incharge</label><select id="inchargeSelect"><option value="">-- SELECT --</option></select></div>
+                    <div class="input-group"><label>Animal Status</label><select id="aStatus"><option>ALIVE</option><option>DEAD</option><option>LOST</option></select></div>
+                    <div class="input-group"><label>Price</label><input type="text" id="priceDisplay" readonly class="readonly-input"></div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group"><label>Day 0</label><input type="date" id="d0" onchange="autoFillDoseDates()"></div>
+                    <div class="input-group"><label>Day 3</label><input type="date" id="d3"></div>
+                    <div class="input-group"><label>Day 7</label><input type="date" id="d7"></div>
+                    <div class="input-group"><label>Day 14</label><input type="date" id="d14"></div>
+                    <div class="input-group"><label>Day 28</label><input type="date" id="d28" onchange="handleD28Change()"></div>
+                    <div class="input-group">
+                        <label>Outcome</label>
+                        <select id="outcome">
+                            <option value="INC" selected>INC</option>
+                            <option value="C">C</option>
+                            <option value="N">N</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group remarks-input"><label>Remarks</label><input type="text" id="remarks"></div>
+                </div>
+            </div>
+            <div class="btn-container-right">
+                <button type="button" class="clear-btn" onclick="closePatientModal()">Cancel</button>
+                <button type="submit" id="submitBtn" class="primary-btn">Submit Record</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+// ═══════════════════════════════════════════════════════════
+//  SHARED STATE
+// ═══════════════════════════════════════════════════════════
+let patientRecords   = [];
+let archiveRecords   = [];
+let vaccineInventory = [];
+let systemUsers      = [];
+let activeCardFilter = 'all'; // tracks which card filter is active
+let editIndex        = -1;
+let stockEditIndex   = -1;
+let currentReportType = 'finance';
+
+// IDs needed for updates (DB-driven)
+let editIncidentId  = null;
+let editPatientId   = null;
+let editTreatmentId = null;
+let editScheduleId  = null;
+
+// ═══════════════════════════════════════════════════════════
+//  INIT — validate session first, then load all data
+// ═══════════════════════════════════════════════════════════
+async function init() {
+    try {
+        const res  = await fetch('api/get_session.php');
+        const data = await res.json();
+        if (!data.success) {
+            window.location.href = 'login.html';
+            return;
+        }
+        // Update sessionStorage display values from real server session
+        sessionStorage.setItem('userRole',         data.role);
+        sessionStorage.setItem('loggedInPosition', data.position);
+        sessionStorage.setItem('loggedInName',     data.name);
+        if (data.role !== 'ADMIN' && data.role !== 'SUPERADMIN') { window.location.href = 'login.html'; return; }
+    } catch(e) {
+        window.location.href = 'login.html';
+        return;
+    }
+    await Promise.all([loadPatients(), loadInventory(), loadIncharge()]);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  API HELPERS
+// ═══════════════════════════════════════════════════════════
+async function apiFetch(url, options = {}) {
+    const res  = await fetch(url, options);
+    const data = await res.json();
+    if (!data.success && res.status === 401) {
+        window.location.href = 'login.html';
+    }
+    return data;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  LOAD FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+async function loadPatients() {
+    const data = await apiFetch('api/get_patients.php');
+    if (data.success) {
+        patientRecords = data.data;
+        renderPatients(); updateDashboardCards();
+    }
+}
+
+async function loadInventory() {
+    const data = await apiFetch('api/get_inventory.php');
+    if (data.success) {
+        vaccineInventory = data.data;
+        renderInventory();
+        updateBrandOptions();
+    }
+}
+
+async function loadIncharge() {
+    const data = await apiFetch('api/get_incharge.php');
+    if (data.success) updateInchargeOptions(data.data);
+}
+
+async function loadUsers() {
+    const data = await apiFetch('api/get_users.php');
+    if (data.success) {
+        systemUsers = data.data;
+        renderUsers();
+    }
+}
+
+async function loadArchive() {
+    const data = await apiFetch('api/get_patients.php?archived=1');
+    if (data.success) {
+        archiveRecords = data.data;
+        renderArchive();
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════════════════════
+function toggleNav() {
+    const nav = document.getElementById('sideNav');
+    nav.style.width = (nav.style.width === '250px') ? '0' : '250px';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DATE HELPERS (unchanged)
+// ═══════════════════════════════════════════════════════════
+
+function updateDashboardCards() {
+    const total     = patientRecords.length;
+    const pending   = patientRecords.filter(r => r.outcome === 'INC' && (!r.d0 || r.d0.trim() === '')).length;
+    const treatment = patientRecords.filter(r => r.outcome === 'INC' && r.d0 && r.d0.trim() !== '').length;
+    const completed = patientRecords.filter(r => r.outcome === 'C').length;
+    document.getElementById('cardTotal').textContent     = total;
+    document.getElementById('cardPending').textContent   = pending;
+    document.getElementById('cardTreatment').textContent = treatment;
+    document.getElementById('cardCompleted').textContent = completed;
+}
+
+function autoFillDoseDates() {
+    const d0Val = document.getElementById('d0').value;
+    if (!d0Val || d0Val.trim() === '') {
+        ['d3','d7','d14','d28'].forEach(id => { document.getElementById(id).value = ''; });
+        handleD28Change();
+    }
+    // Doses d3, d7, d14, d28 are NOT auto-filled.
+    // Staff enters them manually each time the patient returns.
+    // The receipt auto-calculates expected dates for the patient to know when to come back.
+}
+
+function formatDate(str) {
+    if (!str || str.trim() === '') return '';
+    const p = str.split('-');
+    if (p.length !== 3) return str;
+    return `${p[1]}/${p[2]}/${p[0]}`;
+}
+
+function calcExpected(d0Str, days) {
+    if (!d0Str || d0Str.trim() === '') return 'N/A';
+    const d = new Date(d0Str);
+    d.setDate(d.getDate() + days);
+    return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
+function displayDose(val) {
+    return (!val || val.trim() === '') ? '' : formatDate(val);
+}
+
+function handleD28Change() {
+    const d28 = document.getElementById('d28').value;
+    const outcomeEl = document.getElementById('outcome');
+    if (d28 && d28.trim() !== '') {
+        if (outcomeEl.value !== 'N' && outcomeEl.value !== 'D') outcomeEl.value = 'C';
+    } else {
+        if (outcomeEl.value === 'C') outcomeEl.value = 'INC';
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  USER MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+function openUserModal()  { toggleNav(); document.getElementById('userModal').style.display = 'block'; loadUsers(); }
+function closeUserModal() { document.getElementById('userModal').style.display = 'none'; }
+
+async function saveUser(e) {
+    e.preventDefault();
+    const msgEl = document.getElementById('userFormMsg');
+    msgEl.style.display = 'none';
+
+    const payload = {
+        fName:    document.getElementById('uFName').value,
+        mName:    document.getElementById('uMName').value,
+        lName:    document.getElementById('uLName').value,
+        username: document.getElementById('uUsername').value,
+        password: document.getElementById('uPassword').value,
+        role:     document.getElementById('uRole').value,
+    };
+
+    const data = await apiFetch('api/save_user.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (data.success) {
+        document.getElementById('userForm').reset();
+        msgEl.style.cssText = 'display:block;background:#e8f5e9;color:#18ad08;border:1px solid #18ad08;padding:10px 14px;border-radius:6px;font-weight:700;font-size:13px;margin-bottom:12px;';
+        msgEl.textContent = 'User created successfully.';
+        await loadUsers();
+        await loadIncharge();
+    } else {
+        msgEl.style.cssText = 'display:block;background:#fff0f0;color:#ca0717;border:1px solid #ca0717;padding:10px 14px;border-radius:6px;font-weight:700;font-size:13px;margin-bottom:12px;';
+        msgEl.textContent = data.message || 'Failed to create user.';
+    }
+}
+
+function renderUsers() {
+    const ub = document.getElementById('userListBody');
+    ub.innerHTML = '';
+    systemUsers.forEach(u => {
+        const isSuper = u.role === 'SUPERADMIN';
+        ub.insertAdjacentHTML('beforeend', `
+            <tr>
+                <td style="padding:10px;text-align:center;">${u.fullName}</td>
+                <td style="padding:10px;text-align:center;">${u.username}</td>
+                <td style="padding:10px;text-align:center;">${u.role}</td>
+                <td style="padding:10px;text-align:center;font-weight:600;color:#0771b2;">${u.position}</td>
+                <td style="padding:10px;text-align:center;vertical-align:middle;">
+                    ${isSuper ? '---' : `<button class="del-user-btn" onclick="deleteUser(${u.id})" style="margin:0 auto;display:flex;align-items:center;justify-content:center;">DELETE</button>`}
+                </td>
+            </tr>`);
+    });
+}
+
+async function deleteUser(id) {
+    if (!confirm('Delete this user?')) return;
+    const data = await apiFetch('api/delete_user.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: id })
+    });
+    if (data.success) {
+        await loadUsers();
+        await loadIncharge();
+    } else {
+        alert(data.message || 'Failed to delete user.');
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PATIENT FORM
+// ═══════════════════════════════════════════════════════════
+function getFormData() {
+    const fields = ['regDate','lName','fName','mName','addr','contactNo','age','sex','place','bDate',
+                    'animal','bType','site','cat','wash','rig','brand','route',
+                    'd0','d3','d7','d14','d28','outcome','aStatus','remarks'];
+    let d = {};
+    fields.forEach(k => {
+        const el = document.getElementById(k);
+        if (el) d[k] = el.value;
+    });
+    const icSel = document.getElementById('inchargeSelect');
+    d.inchargeId      = icSel.value;
+    d.inchargeDisplay = icSel.options[icSel.selectedIndex]?.text || '';
+    d.registeredBy    = sessionStorage.getItem('loggedInPosition') || 'N/A';
+    // Include DB IDs for update
+    d.incident_id  = editIncidentId;
+    d.patient_id   = editPatientId;
+    d.treatment_id = editTreatmentId;
+    d.schedule_id  = editScheduleId;
+    return d;
+}
+
+document.getElementById('biteForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const data = getFormData();
+
+    // Auto-set outcome
+    if (data.d28 && data.d28.trim() !== '') {
+        if (data.outcome !== 'N' && data.outcome !== 'D') {
+            data.outcome = 'C';
+            document.getElementById('outcome').value = 'C';
+        }
+    } else if (data.outcome === 'C') {
+        data.outcome = 'INC';
+        document.getElementById('outcome').value = 'INC';
+    }
+
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Saving...';
+
+    const result = await apiFetch('api/save_patient.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+
+    if (result.success) {
+        await loadPatients();
+        await loadInventory();
+        resetPatientForm();
+    } else {
+        alert(result.message || 'Failed to save record.');
+        submitBtn.disabled = false;
+        submitBtn.innerText = editIncidentId ? 'UPDATE RECORD' : 'Submit Record';
+    }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  CARD FILTER — click a card to filter the table
+// ═══════════════════════════════════════════════════════════
+function setCardFilter(filter) {
+    // Toggle off: clicking the already-active card resets to 'all'
+    if (activeCardFilter === filter && filter !== 'all') {
+        activeCardFilter = 'all';
+    } else {
+        activeCardFilter = filter;
+    }
+
+    // Update active highlight on cards
+    ['all','pending','treatment','completed'].forEach(f => {
+        const el = document.getElementById('cardBtn-' + f);
+        if (el) el.classList.toggle('active', activeCardFilter === f);
+    });
+
+    // Re-render with new filter applied
+    renderPatients();
+}
+
+function getFilteredRecords() {
+    switch (activeCardFilter) {
+        case 'pending':
+            return patientRecords.filter(r => r.outcome === 'INC' && (!r.d0 || r.d0.trim() === ''));
+        case 'treatment':
+            return patientRecords.filter(r => r.outcome === 'INC' && r.d0 && r.d0.trim() !== '');
+        case 'completed':
+            return patientRecords.filter(r => r.outcome === 'C');
+        default:
+            return patientRecords;
+    }
+}
+
+function renderPatients() {
+    const tb      = document.getElementById('tableBody');
+    tb.innerHTML  = '';
+    const visible = getFilteredRecords();
+    visible.forEach((d, rowNum) => {
+        const i = patientRecords.indexOf(d);
+        tb.insertAdjacentHTML('beforeend', `
+            <tr onclick="editRecord(${i})">
+                <td>${rowNum + 1}</td>
+                <td>${formatDate(d.regDate)}</td>
+                <td>${d.lName}, ${d.fName} ${d.mName || ''}</td>
+                <td>${d.addr}</td>
+                <td>${d.age}</td>
+                <td>${d.sex}</td>
+                <td>${d.place}</td>
+                <td>${d.animal}</td>
+                <td>${d.bType}</td>
+                <td>${d.site}</td>
+                <td>${d.cat}</td>
+                <td>${d.wash}</td>
+                <td>${formatDate(d.rig)}</td>
+                <td>${d.route}</td>
+                <td>${formatDate(d.d0)}</td>
+                <td>${displayDose(d.d3)}</td>
+                <td>${displayDose(d.d7)}</td>
+                <td>${displayDose(d.d14)}</td>
+                <td>${displayDose(d.d28)}</td>
+                <td>${d.brand}</td>
+                <td>${d.outcome}</td>
+                <td>${d.aStatus}</td>
+                <td>${d.remarks}</td>
+                <td onclick="event.stopPropagation()" style="display:flex;flex-wrap:nowrap;justify-content:center;align-items:center;gap:4px;padding:8px 6px;border:none;min-width:240px;">
+                    <button onclick="printReceipt(${i})">PRINT</button>
+                    <button onclick="deleteRecord(${i})">DELETE</button>
+                    ${(() => {
+                        if (d.outcome === 'INC' && !d.is_defaulted) return `<button class="default-btn" onclick="openDefaulterModal(${i})">DEFAULT</button>`;
+                        if (d.is_defaulted) return `<span style="font-size:10px;font-weight:700;color:#b45309;letter-spacing:0.5px;padding:0 4px;">DEFAULTED</span>`;
+                        if (d.outcome === 'C')   return `<span style="font-size:10px;font-weight:700;color:#16a34a;letter-spacing:0.5px;padding:0 4px;">COMPLETED</span>`;
+                        if (d.outcome === 'N')   return `<span style="font-size:10px;font-weight:700;color:#6b7280;letter-spacing:0.5px;padding:0 4px;">NON-COMPLIANT</span>`;
+                        if (d.outcome === 'D')   return `<span style="font-size:10px;font-weight:700;color:#1f2937;letter-spacing:0.5px;padding:0 4px;">DIED</span>`;
+                        return '';
+                    })()}
+                </td>
+            </tr>`);
+    });
+}
+
+function editRecord(i) {
+    const d = patientRecords[i];
+    editIndex      = i;
+    editIncidentId = d.incident_id;
+    editPatientId  = d.patient_id;
+    editTreatmentId= d.treatment_id;
+    editScheduleId = d.schedule_id;
+
+    const fieldMap = {
+        regDate: d.regDate, lName: d.lName, fName: d.fName, mName: d.mName,
+        addr: d.addr, contactNo: d.contactNo, age: d.age, sex: d.sex, place: d.place, bDate: d.bDate,
+        animal: d.animal, bType: d.bType, site: d.site, cat: d.cat,
+        wash: d.wash, rig: d.rig, brand: d.brand, route: d.route,
+        d0: d.d0, d3: d.d3, d7: d.d7, d14: d.d14, d28: d.d28,
+        outcome: d.outcome, aStatus: d.aStatus, remarks: d.remarks
+    };
+    Object.entries(fieldMap).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && v !== null && v !== undefined) el.value = v;
+    });
+    if (d.inchargeId) document.getElementById('inchargeSelect').value = d.inchargeId;
+
+    document.getElementById('submitBtn').innerText = 'UPDATE RECORD';
+    document.getElementById('submitBtn').style.background = '#18ad08';
+    document.getElementById('patientModalTitle').innerText = 'EDIT PATIENT RECORD';
+    document.getElementById('patientModal').style.display = 'block';
+}
+
+async function deleteRecord(i) {
+    if (!confirm('Archive this record?')) return;
+    const d = patientRecords[i];
+    const result = await apiFetch('api/delete_patient.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ incident_id: d.incident_id })
+    });
+    if (result.success) {
+        await loadPatients();
+        await loadArchive();
+    } else {
+        alert(result.message || 'Failed to archive record.');
+    }
+}
+
+function resetPatientForm() {
+    document.getElementById('biteForm').reset();
+    document.getElementById('outcome').value = 'INC';
+    editIndex = -1; editIncidentId = null; editPatientId = null;
+    editTreatmentId = null; editScheduleId = null;
+    const btn = document.getElementById('submitBtn');
+    btn.innerText = 'Submit Record';
+    btn.style.background = '#000';
+    btn.disabled = false;
+}
+
+function openPatientModal() {
+    resetPatientForm();
+    document.getElementById('patientModalTitle').innerText = 'REGISTER NEW PATIENT';
+    document.getElementById('patientModal').style.display = 'block';
+}
+
+function closePatientModal() {
+    document.getElementById('patientModal').style.display = 'none';
+    resetPatientForm();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INVENTORY
+// ═══════════════════════════════════════════════════════════
+function renderInventory() {
+    const container = document.getElementById('inventoryBody'); container.innerHTML = '';
+    const today = new Date(); today.setHours(0,0,0,0); const warnMs = 30*86400000;
+    const active  = vaccineInventory.filter(b => parseInt(b.is_expired)===0 && parseInt(b.qty)>0);
+    const expired = vaccineInventory.filter(b => parseInt(b.is_expired)===1);
+    if (active.length===0 && expired.length===0) { container.innerHTML='<p class="inv-empty">No vaccine stock available.</p>'; return; }
+    let html = '<table class="inventory-grouped-table"><thead><tr><th>Batch</th><th>Qty</th><th>Date Stocked</th><th>Expiry</th><th>Price</th><th>Status</th></tr></thead><tbody>';
+    if (active.length>0) {
+        const groups={};
+        active.forEach(b=>{ if(!groups[b.name])groups[b.name]=[]; groups[b.name].push(b); });
+        Object.keys(groups).sort().forEach(brand=>{
+            const batches=groups[brand].sort((a,b)=>new Date(a.expiry)-new Date(b.expiry));
+            const totalQty=batches.reduce((s,b)=>s+parseInt(b.qty),0); const lowStock=totalQty<10;
+            html+='<tr class="inventory-group-header"><td colspan="6"><span class="group-brand-name">'+brand+'</span><span class="group-total-qty">Total: '+totalQty+' doses</span>'+(lowStock?'<span class="low-stock-badge">⚠ LOW STOCK</span>':'')+'</td></tr>';
+            batches.forEach((b,idx)=>{ const isFirst=idx===0; const expiringSoon=(new Date(b.expiry)-today)<=warnMs;
+                html+='<tr class="inventory-batch-row" onclick="editStock('+b.id+')"><td class="batch-cell">'+(isFirst?'<span class="fefo-icon">▶</span>':'<span class="fefo-spacer"></span>')+'Batch '+(idx+1)+'</td><td>'+b.qty+'</td><td>'+formatDate(b.dateStocked)+'</td><td class="'+(expiringSoon?'expiring-soon':'')+'">'+formatDate(b.expiry)+(expiringSoon?' ⚠':'')+'</td><td>₱'+b.price+'</td><td><span class="status-active-badge">ACTIVE</span></td></tr>';
+            });
+        });
+    }
+    if (expired.length>0) {
+        html+='<tr class="inventory-expired-header"><td colspan="6">⚠ EXPIRED BATCHES — For Monitoring Only</td></tr>';
+        const eg={};
+        expired.forEach(b=>{ if(!eg[b.name])eg[b.name]=[]; eg[b.name].push(b); });
+        Object.keys(eg).sort().forEach(brand=>{
+            const batches=eg[brand].sort((a,b)=>new Date(a.expiry)-new Date(b.expiry));
+            html+='<tr class="inventory-group-header expired-group-header"><td colspan="6"><span class="group-brand-name">'+brand+'</span><span class="group-total-qty">Qty: '+batches.reduce((s,b)=>s+parseInt(b.qty),0)+' doses (expired)</span></td></tr>';
+            batches.forEach((b,idx)=>{ html+='<tr class="inventory-batch-row inventory-expired-row" onclick="editStock('+b.id+')"><td class="batch-cell"><span class="fefo-spacer"></span>Batch '+(idx+1)+'</td><td>'+b.qty+'</td><td>'+formatDate(b.dateStocked)+'</td><td>'+formatDate(b.expiry)+'</td><td>₱'+b.price+'</td><td><span class="expired-badge">EXPIRED</span></td></tr>'; });
+        });
+    }
+    html+='</tbody></table>'; container.innerHTML=html;
+}
+
+function editStock(id) {
+    const b = vaccineInventory.find(v => v.id == id);
+    if (!b) return;
+    stockEditIndex = id;
+    document.getElementById('vName').value  = b.name;
+    document.getElementById('vQty').value   = b.qty;
+    document.getElementById('vDate').value  = b.dateStocked;
+    document.getElementById('vExp').value   = b.expiry;
+    document.getElementById('vPrice').value = b.price;
+    document.getElementById('stockSubmitBtn').innerText = 'UPDATE BATCH';
+    document.getElementById('stockClearBtn').innerText  = 'CANCEL';
+}
+
+function resetStockForm() {
+    stockEditIndex = -1;
+    document.getElementById('stockForm').reset();
+    document.getElementById('stockSubmitBtn').innerText = 'SAVE BATCH';
+    document.getElementById('stockClearBtn').innerText  = 'CLEAR';
+}
+
+document.getElementById('stockForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const payload = {
+        id:          stockEditIndex !== -1 ? stockEditIndex : null,
+        name:        document.getElementById('vName').value,
+        qty:         document.getElementById('vQty').value,
+        dateStocked: document.getElementById('vDate').value,
+        expiry:      document.getElementById('vExp').value,
+        price:       document.getElementById('vPrice').value,
+    };
+    const result = await apiFetch('api/save_batch.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    if (result.success) {
+        await loadInventory();
+        resetStockForm();
+    } else {
+        alert(result.message || 'Failed to save batch.');
+    }
+});
+
+function updateBrandOptions() {
+    const s = document.getElementById('brand');
+    const unique = [...new Set(vaccineInventory.filter(v => parseInt(v.qty) > 0).map(x => x.name))];
+    s.innerHTML = '<option value="">-- SELECT --</option>';
+    unique.forEach(bn => {
+        const first = vaccineInventory.find(v => v.name === bn && parseInt(v.qty) > 0);
+        s.insertAdjacentHTML('beforeend', `<option value="${bn}" data-price="${first.price}">${bn}</option>`);
+    });
+}
+
+function updatePriceDisplay() {
+    const s = document.getElementById('brand');
+    const p = s.options[s.selectedIndex]?.getAttribute('data-price') || '0';
+    document.getElementById('priceDisplay').value = '₱' + p;
+}
+
+function updateInchargeOptions(list) {
+    const sel = document.getElementById('inchargeSelect');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">-- SELECT --</option>';
+    list.forEach(u => {
+        sel.insertAdjacentHTML('beforeend',
+            `<option value="${u.id}" ${u.id == cur ? 'selected' : ''}>${u.position}</option>`);
+    });
+}
+
+function filterTable() {
+    const v = document.getElementById('searchBar').value.toUpperCase();
+    Array.from(document.getElementById('tableBody').rows)
+         .forEach(x => x.style.display = x.innerText.toUpperCase().includes(v) ? '' : 'none');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PRINT RECEIPT (unchanged logic)
+// ═══════════════════════════════════════════════════════════
+function printReceipt(i) {
+    const d = patientRecords[i];
+    const now = new Date();
+    document.getElementById('currentPrintDate').innerText = now.toLocaleDateString();
+    document.getElementById('receiptNumber').innerText    = String(i+1).padStart(6,'0');
+    document.getElementById('pName').innerText            = `${d.lName}, ${d.fName} ${d.mName || ''}`;
+    document.getElementById('pDate').innerText            = formatDate(d.regDate);
+    document.getElementById('pBrand').innerText           = d.brand;
+    document.getElementById('pPrice').innerText           = '₱' + (d.currentPrice || '0');
+    document.getElementById('pTotalPrice').innerText      = '₱' + (d.currentPrice || '0');
+    document.getElementById('pRegisteredBy').innerText    = d.registeredBy || 'N/A';
+    document.getElementById('pIncharge').innerText        = d.inchargeDisplay || 'N/A';
+    document.getElementById('r0').innerText  = formatDate(d.d0) || 'N/A';
+    document.getElementById('r3').innerText  = (d.d3  && d.d3.trim()  !== '') ? formatDate(d.d3)  : calcExpected(d.d0, 3);
+    document.getElementById('r7').innerText  = (d.d7  && d.d7.trim()  !== '') ? formatDate(d.d7)  : calcExpected(d.d0, 7);
+    document.getElementById('r14').innerText = (d.d14 && d.d14.trim() !== '') ? formatDate(d.d14) : calcExpected(d.d0, 14);
+    document.getElementById('r28').innerText = (d.d28 && d.d28.trim() !== '') ? formatDate(d.d28) : calcExpected(d.d0, 28);
+    window.print();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  REPORTS
+// ═══════════════════════════════════════════════════════════
+function openReportModal() {
+    toggleNav();
+    document.getElementById('reportModal').style.display = 'block';
+    document.getElementById('dateRangeFilter').value = 'all';
+    document.getElementById('specificDateGroup').style.display = 'none';
+    refreshCurrentView();
+}
+
+function closeReportModal() { document.getElementById('reportModal').style.display = 'none'; }
+
+function handleDateRangeChange() {
+    const val = document.getElementById('dateRangeFilter').value;
+    document.getElementById('specificDateGroup').style.display = (val === 'specific') ? 'flex' : 'none';
+    refreshCurrentView();
+}
+
+async function refreshCurrentView() {
+    const range = document.getElementById('dateRangeFilter').value;
+    const date  = document.getElementById('specificDate').value;
+    const data  = await apiFetch(`api/get_reports.php?type=finance&range=${range}&date=${date}`);
+    if (!data.success) return;
+    document.getElementById('statRevenue').innerText = `Total: ₱${data.totalRevenue}`;
+    const tbody = document.getElementById('financeReportBody');
+    tbody.innerHTML = '';
+    data.data.forEach(r => {
+        tbody.insertAdjacentHTML('beforeend', `
+            <tr><td>${r.brand}</td><td>${r.count}</td><td>₱${r.total}</td></tr>`);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DEFAULTER MODAL
+// ═══════════════════════════════════════════════════════════
+let defaulterIncidentId = null;
+let defaulterPatientId  = null;
+
+function detectMissedDose(d) {
+    const doses = [['D3',d.d3],['D7',d.d7],['D14',d.d14],['D28',d.d28]];
+    for (const [label, val] of doses) {
+        if (!val || val.trim() === '') return label;
+    }
+    return 'D28';
+}
+
+function openDefaulterModal(i) {
+    const d = patientRecords[i];
+    defaulterIncidentId = d.incident_id;
+    defaulterPatientId  = d.patient_id;
+
+    document.getElementById('def_patientId').value  = d.patient_id;
+    document.getElementById('def_name').value       = `${d.lName}, ${d.fName}${d.mName ? ' ' + d.mName : ''}`;
+    document.getElementById('def_age').value        = d.age;
+    document.getElementById('def_gender').value     = d.sex === 'M' ? 'MALE' : 'FEMALE';
+    document.getElementById('def_contact').value    = d.contactNo || 'N/A';
+    document.getElementById('def_category').value   = 'CAT ' + d.cat;
+    document.getElementById('def_missedDose').value = detectMissedDose(d);
+    document.getElementById('def_d0').value         = formatDate(d.d0) || 'N/A';
+    document.getElementById('def_d3').value         = formatDate(d.d3) || 'N/A';
+    document.getElementById('def_d7').value         = formatDate(d.d7) || 'N/A';
+    document.getElementById('def_d14').value        = formatDate(d.d14) || 'N/A';
+    document.getElementById('def_d28').value        = formatDate(d.d28) || 'N/A';
+
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('def_dateEntry').value  = today;
+    document.getElementById('def_staff').value      = sessionStorage.getItem('loggedInPosition') || 'N/A';
+    document.getElementById('def_reason').value  = '';
+    document.getElementById('def_action').value  = '';
+    document.getElementById('def_remarks').value = '';
+
+    document.getElementById('defaulterModal').style.display = 'block';
+}
+
+function closeDefaulterModal() {
+    document.getElementById('defaulterModal').style.display = 'none';
+    defaulterIncidentId = null;
+    defaulterPatientId  = null;
+}
+
+async function confirmDefaulter() {
+    const dateEntry = document.getElementById('def_dateEntry').value;
+    const reason    = document.getElementById('def_reason').value.trim();
+    const action    = document.getElementById('def_action').value.trim();
+    const remarks   = document.getElementById('def_remarks').value.trim();
+    const missed    = document.getElementById('def_missedDose').value;
+
+    if (!dateEntry) { alert('Please set the date of entry.'); return; }
+    if (!reason)    { alert('Please provide a reason for default.'); return; }
+
+    const btn = document.getElementById('confirmDefaultBtn');
+    btn.disabled = true;
+    btn.innerText = 'Saving...';
+
+    const result = await apiFetch('api/save_defaulter.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            patient_id:  defaulterPatientId,
+            incident_id: defaulterIncidentId,
+            date_of_entry:       dateEntry,
+            missed_dose:         missed,
+            reason_for_default:  reason,
+            action_taken:        action,
+            remarks:             remarks
+        })
+    });
+
+    btn.disabled = false;
+    btn.innerText = 'CONFIRM DEFAULT';
+
+    if (result.success) {
+        alert('Patient marked as defaulter successfully.');
+        closeDefaulterModal();
+    } else {
+        alert(result.message || 'Failed to save defaulter record.');
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DEFAULTER LOGBOOK MODAL
+// ═══════════════════════════════════════════════════════════
+let defaulterRecords = [];
+
+async function openDefaulterLogModal() {
+    toggleNav();
+    document.getElementById('defaulterLogModal').style.display = 'block';
+    const result = await apiFetch('api/get_defaulters.php');
+    if (result.success) {
+        defaulterRecords = result.data;
+        renderDefaulterLog();
+    }
+}
+
+function closeDefaulterLogModal() {
+    document.getElementById('defaulterLogModal').style.display = 'none';
+}
+
+function renderDefaulterLog() {
+    const tb = document.getElementById('defaulterLogBody');
+    tb.innerHTML = '';
+    if (defaulterRecords.length === 0) {
+        tb.innerHTML = '<tr><td colspan="16" style="padding:20px;text-align:center;color:#9ca3af;">No defaulter records found.</td></tr>';
+        return;
+    }
+    defaulterRecords.forEach((r, idx) => {
+        tb.insertAdjacentHTML('beforeend', `
+            <tr style="background:#fff;">
+                <td style="padding:12px 10px;white-space:nowrap;border:2px solid #000;color:#000;font-size:12px;">${r.date_of_entry || ''}</td>
+                <td style="padding:12px 10px;border:2px solid #000;color:#000;font-size:12px;">${r.patient_id}</td>
+                <td style="padding:12px 10px;text-align:left;white-space:nowrap;border:2px solid #000;color:#000;font-size:12px;">${r.name}</td>
+                <td style="padding:12px 10px;border:2px solid #000;color:#000;font-size:12px;">${r.age}</td>
+                <td style="padding:12px 10px;border:2px solid #000;color:#000;font-size:12px;">${r.gender}</td>
+                <td style="padding:12px 10px;white-space:nowrap;border:2px solid #000;color:#000;font-size:12px;">${r.contact_no || 'N/A'}</td>
+                <td style="padding:12px 10px;border:2px solid #000;color:#000;font-size:12px;">CAT ${r.category}</td>
+                <td style="padding:12px 10px;white-space:nowrap;border:2px solid #000;color:#000;font-size:12px;">${r.d0 || 'N/A'}</td>
+                <td style="padding:12px 10px;white-space:nowrap;border:2px solid #000;color:#000;font-size:12px;">${r.d3 || 'N/A'}</td>
+                <td style="padding:12px 10px;white-space:nowrap;border:2px solid #000;color:#000;font-size:12px;">${r.d7 || 'N/A'}</td>
+                <td style="padding:12px 10px;white-space:nowrap;border:2px solid #000;color:#000;font-size:12px;">${r.d14 || 'N/A'}</td>
+                <td style="padding:12px 10px;white-space:nowrap;border:2px solid #000;color:#000;font-size:12px;">${r.d28 || 'N/A'}</td>
+                <td style="padding:12px 10px;text-align:left;border:2px solid #000;color:#000;font-size:12px;">${r.reason_for_default || ''}</td>
+                <td style="padding:12px 10px;text-align:left;border:2px solid #000;color:#000;font-size:12px;">${r.action_taken || ''}</td>
+                <td style="padding:12px 10px;text-align:left;border:2px solid #000;color:#000;font-size:12px;">${r.remarks || ''}</td>
+                <td style="padding:12px 10px;white-space:nowrap;border:2px solid #000;color:#000;font-size:12px;">${r.staff_responsible || ''}</td>
+            </tr>`);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ARCHIVE
+// ═══════════════════════════════════════════════════════════
+async function openArchiveModal() {
+    toggleNav();
+    document.getElementById('archiveModal').style.display = 'block';
+    await loadArchive();
+}
+
+function closeArchiveModal() { document.getElementById('archiveModal').style.display = 'none'; }
+
+function renderArchive() {
+    const ab = document.getElementById('archiveBody');
+    ab.innerHTML = '';
+    if (archiveRecords.length === 0) {
+        ab.innerHTML = '<tr><td colspan="3" style="padding:20px;text-align:center;color:#9ca3af;">No archived records found.</td></tr>';
+        return;
+    }
+    archiveRecords.forEach(r => {
+        const fullName = r.mName ? `${r.lName}, ${r.fName} ${r.mName}` : `${r.lName}, ${r.fName}`;
+        ab.insertAdjacentHTML('beforeend', `
+            <tr>
+                <td style="padding:10px;text-align:center;">${fullName}</td>
+                <td style="padding:10px;text-align:center;">${r.dateDeleted || ''}</td>
+                <td style="padding:10px;text-align:center;vertical-align:middle;">
+                    <button class="primary-btn" onclick="restoreRecord(${r.incident_id})" style="margin:0 auto;display:flex;align-items:center;justify-content:center;">RESTORE</button>
+                </td>
+            </tr>`);
+    });
+}
+
+async function restoreRecord(incidentId) {
+    const result = await apiFetch('api/restore_patient.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ incident_id: incidentId })
+    });
+    if (result.success) {
+        await loadArchive();
+        await loadPatients();
+    } else {
+        alert(result.message || 'Failed to restore record.');
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  LOGOUT
+// ═══════════════════════════════════════════════════════════
+function logoutUser() {
+    if (confirm('Logout?')) window.location.href = 'logout.php';
+}
+
+window.onload = init;
+</script>
+
+<!-- DEFAULTER CONFIRMATION MODAL -->
+<div id="defaulterModal" class="modal no-print">
+    <div class="modal-content" style="max-width:680px;">
+        <span class="close" onclick="closeDefaulterModal()">&times;</span>
+        <h2 class="user-mgmt-title">MARK AS DEFAULTER</h2>
+        <div class="form-section-box" style="margin-bottom:14px;">
+            <h3 class="section-subtitle">PATIENT INFORMATION</h3>
+            <div class="input-row">
+                <div class="input-group"><label>Patient ID</label><input type="text" id="def_patientId" readonly class="readonly-input"></div>
+                <div class="input-group"><label>Name</label><input type="text" id="def_name" readonly class="readonly-input"></div>
+                <div class="input-group"><label>Age</label><input type="text" id="def_age" readonly class="readonly-input"></div>
+                <div class="input-group"><label>Gender</label><input type="text" id="def_gender" readonly class="readonly-input"></div>
+            </div>
+            <div class="input-row">
+                <div class="input-group"><label>Contact No.</label><input type="text" id="def_contact" readonly class="readonly-input"></div>
+                <div class="input-group"><label>Category</label><input type="text" id="def_category" readonly class="readonly-input"></div>
+                <div class="input-group"><label>Missed Dose</label><input type="text" id="def_missedDose" readonly class="readonly-input"></div>
+            </div>
+            <div class="input-row">
+                <div class="input-group"><label>D0</label><input type="text" id="def_d0" readonly class="readonly-input"></div>
+                <div class="input-group"><label>D3</label><input type="text" id="def_d3" readonly class="readonly-input"></div>
+                <div class="input-group"><label>D7</label><input type="text" id="def_d7" readonly class="readonly-input"></div>
+                <div class="input-group"><label>D14</label><input type="text" id="def_d14" readonly class="readonly-input"></div>
+                <div class="input-group"><label>D28</label><input type="text" id="def_d28" readonly class="readonly-input"></div>
+            </div>
+        </div>
+        <div class="form-section-box">
+            <h3 class="section-subtitle">DEFAULTER DETAILS</h3>
+            <div class="input-row">
+                <div class="input-group"><label>Date of Entry</label><input type="date" id="def_dateEntry"></div>
+                <div class="input-group" style="flex:2;"><label>Reason for Default</label><input type="text" id="def_reason" placeholder="e.g. No show, contact lost..."></div>
+            </div>
+            <div class="input-row">
+                <div class="input-group" style="flex:2;"><label>Action Taken</label><input type="text" id="def_action" placeholder="e.g. Called patient, sent follow-up..."></div>
+                <div class="input-group" style="flex:2;"><label>Remarks</label><input type="text" id="def_remarks" placeholder="Additional notes..."></div>
+            </div>
+            <div class="input-row">
+                <div class="input-group"><label>Staff Responsible</label><input type="text" id="def_staff" readonly class="readonly-input"></div>
+            </div>
+        </div>
+        <div class="btn-container-right" style="margin-top:14px;">
+            <button type="button" class="clear-btn" onclick="closeDefaulterModal()">Cancel</button>
+            <button type="button" id="confirmDefaultBtn" class="primary-btn" style="background:#ca0717;" onclick="confirmDefaulter()">CONFIRM DEFAULT</button>
+        </div>
+    </div>
+</div>
+
+<!-- DEFAULTER LOGBOOK MODAL -->
+<div id="defaulterLogModal" class="modal no-print">
+    <div class="modal-content" style="max-width:95vw;width:95vw;">
+        <span class="close" onclick="closeDefaulterLogModal()">&times;</span>
+        <h3 class="archive-title">DEFAULTER LOGBOOK</h3>
+        <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;text-align:center;font-size:12px;min-width:1400px;border:2px solid #000;">
+                <thead>
+                    <tr>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">Date of Entry</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">Patient ID</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">Name</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">Age</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">Gender</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">Contact No.</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">Category</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">D0</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">D3</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">D7</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">D14</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">D28</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">Reason for Default</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">Action Taken</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">Remarks</th>
+                        <th style="padding:12px 10px;text-align:center;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#000;white-space:nowrap;border:2px solid #000;background:#fff;">Staff Responsible</th>
+                    </tr>
+                </thead>
+                <tbody id="defaulterLogBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

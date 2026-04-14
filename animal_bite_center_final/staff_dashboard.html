@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff - Animal Bite Center</title>
+    <link rel="stylesheet" href="abtc.css">
+</head>
+<body>
+
+<div class="container no-print">
+    <div class="main-header">
+        <div style="display:flex;align-items:center;gap:15px;">
+            <h1><span class="logo-a">A</span>nimal <span class="logo-b">B</span>ite <span class="logo-c">C</span>enter</h1>
+        </div>
+        <div class="top-utils">
+            <input type="text" id="searchBar" placeholder="SEARCH PATIENT..." onkeyup="filterTable()">
+            <button onclick="logoutUser()" class="primary-btn" style="margin-left:12px;">Logout</button>
+        </div>
+    </div>
+
+
+    <!-- ACTION BAR -->
+    <div class="action-bar">
+        <button onclick="openPatientModal()" class="register-patient-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Register New Patient
+        </button>
+    </div>
+
+
+    <!-- DASHBOARD SUMMARY CARDS -->
+    <div class="dashboard-cards">
+        <div class="dash-card active" id="cardBtn-all" onclick="setCardFilter('all')">
+            <div class="dash-card-icon" style="background:rgba(79,70,229,0.12);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.3"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="dash-card-info">
+                <span class="dash-card-count" id="cardTotal">0</span>
+                <span class="dash-card-label">Total Patients</span>
+                <span class="dash-card-sub">All time &middot; active records</span>
+            </div>
+        </div>
+        <div class="dash-card" id="cardBtn-pending" onclick="setCardFilter('pending')">
+            <div class="dash-card-icon" style="background:rgba(234,88,12,0.12);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="dash-card-info">
+                <span class="dash-card-count" id="cardPending">0</span>
+                <span class="dash-card-label">Pending Review</span>
+                <span class="dash-card-sub">Needs attention &middot; no Day 0 yet</span>
+            </div>
+        </div>
+        <div class="dash-card" id="cardBtn-treatment" onclick="setCardFilter('treatment')">
+            <div class="dash-card-icon" style="background:rgba(37,99,235,0.12);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.3"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            </div>
+            <div class="dash-card-info">
+                <span class="dash-card-count" id="cardTreatment">0</span>
+                <span class="dash-card-label">In Treatment</span>
+                <span class="dash-card-sub">Active PEP &middot; vaccination ongoing</span>
+            </div>
+        </div>
+        <div class="dash-card" id="cardBtn-completed" onclick="setCardFilter('completed')">
+            <div class="dash-card-icon" style="background:rgba(22,163,74,0.12);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="dash-card-info">
+                <span class="dash-card-count" id="cardCompleted">0</span>
+                <span class="dash-card-label">Completed</span>
+                <span class="dash-card-sub">Full PEP series &middot; outcome: C</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="centered-header">
+        <p>DEPARTMENT OF HEALTH</p>
+        <p>NATIONAL RABIES PREVENTION AND CONTROL PROGRAM</p>
+        <h2>RABIES EXPOSURE REGISTRY</h2>
+    </div>
+
+    <div class="table-responsive">
+        <table id="patientTable">
+            <thead>
+                <tr>
+                    <th colspan="2">Registration</th><th rowspan="2">Patient Name</th><th rowspan="2">Address</th>
+                    <th colspan="6">Exposure History</th><th rowspan="2">Cat</th><th rowspan="2">Wash</th>
+                    <th rowspan="2">RIG</th><th colspan="7">Vaccine Schedule</th><th rowspan="2">Outcome</th>
+                    <th rowspan="2">Animal Status</th><th rowspan="2">Remarks</th><th rowspan="2">Action</th>
+                </tr>
+                <tr>
+                    <th>ID</th><th>Date</th><th>Age</th><th>Sex</th><th>Place of Occurrence</th><th>Animal</th><th>Type</th><th>Body Site</th><th>Route</th><th>D0</th><th>D3</th><th>D7</th><th>D14</th><th>D28</th><th>Brand</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="inventory-section-fixed">
+        <h3>VACCINE STOCK MONITORING</h3>
+        <div id="inventoryBody"></div>
+    </div>
+</div>
+
+<div id="printSection">
+    <div class="receipt-container">
+        <div class="receipt-header">
+            <h1 class="clinic-name">Animal Bite Center</h1>
+            <p class="clinic-subtitle">Rabies Prevention &amp; Treatment Facility</p>
+            <p class="receipt-date" id="currentPrintDate"></p>
+            <p class="receipt-number">Receipt No: <span id="receiptNumber"></span></p>
+        </div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-body">
+            <div class="patient-info-section">
+                <h3 class="section-title">Patient Information</h3>
+                <div class="info-row"><span class="info-label">Name:</span><span class="info-value" id="pName"></span></div>
+                <div class="info-row"><span class="info-label">Date:</span><span class="info-value" id="pDate"></span></div>
+            </div>
+            <div class="receipt-divider"></div>
+            <div class="charges-section">
+                <h3 class="section-title">Service Details</h3>
+                <div class="charge-row"><span class="charge-label">Vaccine Brand:</span><span class="charge-value" id="pBrand"></span></div>
+                <div class="charge-row"><span class="charge-label">Treatment Fee:</span><span class="charge-value" id="pPrice"></span></div>
+                <div class="charge-row"><span class="charge-label">Registered By:</span><span class="charge-value" id="pRegisteredBy"></span></div>
+                <div class="charge-row"><span class="charge-label">Administered By:</span><span class="charge-value" id="pIncharge"></span></div>
+            </div>
+            <div class="receipt-divider"></div>
+            <div class="schedule-section">
+                <h3 class="section-title">Vaccination Schedule</h3>
+                <div class="schedule-grid">
+                    <div class="schedule-item"><span class="day-label">Day 0:</span><span class="day-value" id="r0"></span></div>
+                    <div class="schedule-item"><span class="day-label">Day 3:</span><span class="day-value" id="r3"></span></div>
+                    <div class="schedule-item"><span class="day-label">Day 7:</span><span class="day-value" id="r7"></span></div>
+                    <div class="schedule-item"><span class="day-label">Day 14:</span><span class="day-value" id="r14"></span></div>
+                    <div class="schedule-item"><span class="day-label">Day 28:</span><span class="day-value" id="r28"></span></div>
+                </div>
+            </div>
+            <div class="receipt-divider-thick"></div>
+            <div class="total-section">
+                <div class="total-row"><span class="total-label">TOTAL AMOUNT:</span><span class="total-value" id="pTotalPrice"></span></div>
+            </div>
+        </div>
+        <div class="receipt-footer">
+            <p class="footer-text">Please follow the vaccination schedule strictly.</p>
+            <p class="footer-text">Keep this receipt for your records.</p>
+            <p class="footer-thank">Thank you!</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  PATIENT REGISTRATION / EDIT MODAL                        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="patientModal" class="modal no-print">
+    <div class="modal-content" style="max-width:1100px;">
+        <span class="close" onclick="closePatientModal()">&times;</span>
+        <h2 id="patientModalTitle">REGISTER NEW PATIENT</h2>
+        <form id="biteForm">
+            <div class="form-section-box" style="margin-bottom:16px;">
+                <h3 class="section-subtitle">Patient Information</h3>
+                <div class="input-row">
+                    <div class="input-group"><label>Date of Registration</label><input type="date" id="regDate" required></div>
+                    <div class="input-group"><label>Last Name</label><input type="text" id="lName" required></div>
+                    <div class="input-group"><label>First Name</label><input type="text" id="fName" required></div>
+                    <div class="input-group"><label>Middle Name</label><input type="text" id="mName"></div>
+                    <div class="input-group"><label>Age</label><input type="number" id="age" required></div>
+                    <div class="input-group"><label>Sex</label><select id="sex"><option>M</option><option>F</option></select></div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group" style="flex:2;"><label>Address (Barangay/City)</label><input type="text" id="addr" required></div>
+                    <div class="input-group"><label>Contact No.</label><input type="text" id="contactNo" placeholder="e.g. 09XXXXXXXXX" maxlength="20"></div>
+                </div>
+            </div>
+            <div class="form-section-box" style="margin-bottom:16px;">
+                <h3 class="section-subtitle">Bite / Exposure Details</h3>
+                <div class="input-row">
+                    <div class="input-group"><label>Place of Occurrence</label><input type="text" id="place" required></div>
+                    <div class="input-group"><label>Date of Bite</label><input type="date" id="bDate" required></div>
+                    <div class="input-group"><label>Type of Animal</label><input type="text" id="animal" required></div>
+                    <div class="input-group"><label>Exposure (B/NB)</label><select id="bType"><option>B</option><option>NB</option></select></div>
+                    <div class="input-group"><label>Body Site</label><input type="text" id="site" required></div>
+                    <div class="input-group"><label>Category</label><select id="cat"><option>1</option><option>2</option><option>3</option></select></div>
+                    <div class="input-group"><label>Wash</label><select id="wash"><option>Y</option><option>N</option></select></div>
+                    <div class="input-group"><label>RIG Given</label><input type="date" id="rig"></div>
+                </div>
+            </div>
+            <div class="form-section-box" style="margin-bottom:16px;">
+                <h3 class="section-subtitle">Treatment & Vaccination</h3>
+                <div class="input-row">
+                    <div class="input-group"><label>Vaccine Brand</label><select id="brand" onchange="updatePriceDisplay()" required><option value="">-- SELECT --</option></select></div>
+                    <div class="input-group"><label>Route</label><input type="text" id="route" placeholder="ID/IM"></div>
+                    <div class="input-group"><label>Injection Incharge</label><select id="inchargeSelect"><option value="">-- SELECT --</option></select></div>
+                    <div class="input-group"><label>Animal Status</label><select id="aStatus"><option>ALIVE</option><option>DEAD</option><option>LOST</option></select></div>
+                    <div class="input-group"><label>Price</label><input type="text" id="priceDisplay" readonly class="readonly-input"></div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group"><label>Day 0</label><input type="date" id="d0" onchange="autoFillDoseDates()"></div>
+                    <div class="input-group"><label>Day 3</label><input type="date" id="d3"></div>
+                    <div class="input-group"><label>Day 7</label><input type="date" id="d7"></div>
+                    <div class="input-group"><label>Day 14</label><input type="date" id="d14"></div>
+                    <div class="input-group"><label>Day 28</label><input type="date" id="d28" onchange="handleD28Change()"></div>
+                    <div class="input-group">
+                        <label>Outcome</label>
+                        <select id="outcome">
+                            <option value="INC" selected>INC</option>
+                            <option value="C">C</option>
+                            <option value="N">N</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group remarks-input"><label>Remarks</label><input type="text" id="remarks"></div>
+                </div>
+            </div>
+            <div class="btn-container-right">
+                <button type="button" class="clear-btn" onclick="closePatientModal()">Cancel</button>
+                <button type="submit" id="submitBtn" class="primary-btn">Submit Record</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+let patientRecords   = [];
+let vaccineInventory = [];
+let activeCardFilter = 'all'; // tracks which card filter is active
+let editIndex        = -1;
+let editIncidentId   = null;
+let editPatientId    = null;
+let editTreatmentId  = null;
+let editScheduleId   = null;
+
+async function init() {
+    try {
+        const res  = await fetch('api/get_session.php');
+        const data = await res.json();
+        if (!data.success) { window.location.href = 'login.html'; return; }
+        sessionStorage.setItem('userRole',         data.role);
+        sessionStorage.setItem('loggedInPosition', data.position);
+        sessionStorage.setItem('loggedInName',     data.name);
+        if (data.role !== 'STAFF') { window.location.href = 'login.html'; return; }
+    } catch(e) { window.location.href = 'login.html'; return; }
+    await Promise.all([loadPatients(), loadInventory(), loadIncharge()]);
+}
+
+async function apiFetch(url, options) {
+    options = options || {};
+    const res  = await fetch(url, options);
+    const data = await res.json();
+    if (!data.success && res.status === 401) window.location.href = 'login.html';
+    return data;
+}
+
+async function loadPatients() {
+    const data = await apiFetch('api/get_patients.php');
+    if (data.success) { patientRecords = data.data; renderPatients(); updateDashboardCards(); }
+}
+
+async function loadInventory() {
+    const data = await apiFetch('api/get_inventory.php');
+    if (data.success) { vaccineInventory = data.data; renderInventory(); updateBrandOptions(); }
+}
+
+async function loadIncharge() {
+    const data = await apiFetch('api/get_incharge.php');
+    if (data.success) updateInchargeOptions(data.data);
+}
+
+function updateDashboardCards() {
+    const total     = patientRecords.length;
+    const pending   = patientRecords.filter(function(r) { return r.outcome === 'INC' && (!r.d0 || r.d0.trim() === ''); }).length;
+    const treatment = patientRecords.filter(function(r) { return r.outcome === 'INC' && r.d0 && r.d0.trim() !== ''; }).length;
+    const completed = patientRecords.filter(function(r) { return r.outcome === 'C'; }).length;
+    document.getElementById('cardTotal').textContent     = total;
+    document.getElementById('cardPending').textContent   = pending;
+    document.getElementById('cardTreatment').textContent = treatment;
+    document.getElementById('cardCompleted').textContent = completed;
+}
+
+function autoFillDoseDates() {
+    const d0Val = document.getElementById('d0').value;
+    if (!d0Val || d0Val.trim() === '') {
+        ['d3','d7','d14','d28'].forEach(function(id) { document.getElementById(id).value = ''; });
+        handleD28Change();
+    }
+    // Doses d3, d7, d14, d28 are NOT auto-filled.
+    // Staff enters them manually each time the patient returns.
+    // The receipt auto-calculates expected dates for the patient to know when to come back.
+}
+
+function formatDate(str) {
+    if (!str || str.trim() === '') return '';
+    const p = str.split('-');
+    if (p.length !== 3) return str;
+    return p[1] + '/' + p[2] + '/' + p[0];
+}
+
+function calcExpected(d0Str, days) {
+    if (!d0Str || d0Str.trim() === '') return 'N/A';
+    const d = new Date(d0Str);
+    d.setDate(d.getDate() + days);
+    return String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0') + '/' + d.getFullYear();
+}
+
+function displayDose(val) { return (!val || val.trim() === '') ? '' : formatDate(val); }
+
+function handleD28Change() {
+    const d28 = document.getElementById('d28').value;
+    const outcomeEl = document.getElementById('outcome');
+    if (d28 && d28.trim() !== '') {
+        if (outcomeEl.value !== 'N' && outcomeEl.value !== 'D') outcomeEl.value = 'C';
+    } else { if (outcomeEl.value === 'C') outcomeEl.value = 'INC'; }
+}
+
+function getFormData() {
+    const fields = ['regDate','lName','fName','mName','addr','contactNo','age','sex','place','bDate',
+                    'animal','bType','site','cat','wash','rig','brand','route',
+                    'd0','d3','d7','d14','d28','outcome','aStatus','remarks'];
+    const d = {};
+    fields.forEach(function(k) { const el = document.getElementById(k); if (el) d[k] = el.value; });
+    const icSel = document.getElementById('inchargeSelect');
+    d.inchargeId      = icSel.value;
+    d.inchargeDisplay = icSel.options[icSel.selectedIndex] ? icSel.options[icSel.selectedIndex].text : '';
+    d.registeredBy    = sessionStorage.getItem('loggedInPosition') || 'N/A';
+    d.incident_id  = editIncidentId;
+    d.patient_id   = editPatientId;
+    d.treatment_id = editTreatmentId;
+    d.schedule_id  = editScheduleId;
+    return d;
+}
+
+document.getElementById('biteForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const data = getFormData();
+    if (data.d28 && data.d28.trim() !== '') {
+        if (data.outcome !== 'N' && data.outcome !== 'D') { data.outcome = 'C'; document.getElementById('outcome').value = 'C'; }
+    } else if (data.outcome === 'C') { data.outcome = 'INC'; document.getElementById('outcome').value = 'INC'; }
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true; submitBtn.innerText = 'Saving...';
+    const result = await apiFetch('api/save_patient.php', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+    });
+    if (result.success) { await loadPatients(); await loadInventory(); resetPatientForm(); }
+    else { alert(result.message || 'Failed to save record.'); submitBtn.disabled = false; submitBtn.innerText = editIncidentId ? 'UPDATE RECORD' : 'Submit Record'; }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  CARD FILTER — click a card to filter the table
+// ═══════════════════════════════════════════════════════════
+function setCardFilter(filter) {
+    // Toggle off: clicking the already-active card resets to 'all'
+    if (activeCardFilter === filter && filter !== 'all') {
+        activeCardFilter = 'all';
+    } else {
+        activeCardFilter = filter;
+    }
+
+    // Update active highlight on cards
+    ['all','pending','treatment','completed'].forEach(function(f) {
+        var el = document.getElementById('cardBtn-' + f);
+        if (el) el.classList.toggle('active', activeCardFilter === f);
+    });
+
+    // Re-render with new filter applied
+    renderPatients();
+}
+
+function getFilteredRecords() {
+    switch (activeCardFilter) {
+        case 'pending':
+            return patientRecords.filter(function(r) { return r.outcome === 'INC' && (!r.d0 || r.d0.trim() === ''); });
+        case 'treatment':
+            return patientRecords.filter(function(r) { return r.outcome === 'INC' && r.d0 && r.d0.trim() !== ''; });
+        case 'completed':
+            return patientRecords.filter(function(r) { return r.outcome === 'C'; });
+        default:
+            return patientRecords;
+    }
+}
+
+function renderPatients() {
+    var tb      = document.getElementById('tableBody');
+    tb.innerHTML = '';
+    var visible = getFilteredRecords();
+    visible.forEach(function(d, rowNum) {
+        var i  = patientRecords.indexOf(d);
+        var tr = document.createElement('tr');
+        tr.style.cursor = 'pointer';
+        (function(idx) {
+            tr.addEventListener('click', function() { editRecord(idx); });
+        })(i);
+        tr.innerHTML =
+            '<td>' + (rowNum + 1) + '</td>' +
+            '<td>' + formatDate(d.regDate) + '</td>' +
+            '<td>' + d.lName + ', ' + d.fName + ' ' + (d.mName || '') + '</td>' +
+            '<td>' + d.addr + '</td>' +
+            '<td>' + d.age + '</td>' +
+            '<td>' + d.sex + '</td>' +
+            '<td>' + d.place + '</td>' +
+            '<td>' + d.animal + '</td>' +
+            '<td>' + d.bType + '</td>' +
+            '<td>' + d.site + '</td>' +
+            '<td>' + d.cat + '</td>' +
+            '<td>' + d.wash + '</td>' +
+            '<td>' + formatDate(d.rig) + '</td>' +
+            '<td>' + d.route + '</td>' +
+            '<td>' + formatDate(d.d0) + '</td>' +
+            '<td>' + displayDose(d.d3) + '</td>' +
+            '<td>' + displayDose(d.d7) + '</td>' +
+            '<td>' + displayDose(d.d14) + '</td>' +
+            '<td>' + displayDose(d.d28) + '</td>' +
+            '<td>' + d.brand + '</td>' +
+            '<td>' + d.outcome + '</td>' +
+            '<td>' + d.aStatus + '</td>' +
+            '<td>' + d.remarks + '</td>';
+        var actionTd = document.createElement('td');
+        actionTd.style.cssText = 'display:flex;flex-wrap:nowrap;justify-content:center;align-items:center;gap:6px;padding:8px 6px;border:none;min-width:180px;';
+        actionTd.addEventListener('click', function(e) { e.stopPropagation(); });
+
+        var printBtn = document.createElement('button');
+        printBtn.textContent = 'PRINT';
+        printBtn.style.cssText = 'background:#0771b2;color:#fff;border:none;padding:6px 10px;height:30px;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;border-radius:4px;cursor:pointer;min-width:62px;white-space:nowrap;';
+        (function(idx) {
+            printBtn.addEventListener('click', function(e) { e.stopPropagation(); printReceipt(idx); });
+        })(i);
+        actionTd.appendChild(printBtn);
+
+        // Outcome status label
+        var statusLabel = document.createElement('span');
+        if (d.is_defaulted) {
+            statusLabel.textContent = 'DEFAULTED';
+            statusLabel.style.cssText = 'font-size:10px;font-weight:700;color:#b45309;letter-spacing:0.5px;padding:0 4px;';
+        } else if (d.outcome === 'C') {
+            statusLabel.textContent = 'COMPLETED';
+            statusLabel.style.cssText = 'font-size:10px;font-weight:700;color:#16a34a;letter-spacing:0.5px;padding:0 4px;';
+        } else if (d.outcome === 'N') {
+            statusLabel.textContent = 'NON-COMPLIANT';
+            statusLabel.style.cssText = 'font-size:10px;font-weight:700;color:#6b7280;letter-spacing:0.5px;padding:0 4px;';
+        } else if (d.outcome === 'D') {
+            statusLabel.textContent = 'DIED';
+            statusLabel.style.cssText = 'font-size:10px;font-weight:700;color:#1f2937;letter-spacing:0.5px;padding:0 4px;';
+        }
+        if (statusLabel.textContent) actionTd.appendChild(statusLabel);
+        tr.appendChild(actionTd);
+        tb.appendChild(tr);
+    });
+}
+
+function editRecord(i) {
+    const d = patientRecords[i];
+    editIndex = i; editIncidentId = d.incident_id; editPatientId = d.patient_id;
+    editTreatmentId = d.treatment_id; editScheduleId = d.schedule_id;
+    const fieldMap = {
+        regDate:d.regDate, lName:d.lName, fName:d.fName, mName:d.mName, addr:d.addr,
+        contactNo:d.contactNo, age:d.age, sex:d.sex, place:d.place, bDate:d.bDate, animal:d.animal,
+        bType:d.bType, site:d.site, cat:d.cat, wash:d.wash, rig:d.rig,
+        brand:d.brand, route:d.route, d0:d.d0, d3:d.d3, d7:d.d7, d14:d.d14,
+        d28:d.d28, outcome:d.outcome, aStatus:d.aStatus, remarks:d.remarks
+    };
+    Object.keys(fieldMap).forEach(function(k) {
+        const el = document.getElementById(k);
+        if (el && fieldMap[k] !== null && fieldMap[k] !== undefined) el.value = fieldMap[k];
+    });
+    if (d.inchargeId) document.getElementById('inchargeSelect').value = d.inchargeId;
+    document.getElementById('submitBtn').innerText = 'UPDATE RECORD';
+    document.getElementById('submitBtn').style.background = '#18ad08';
+    document.getElementById('patientModalTitle').innerText = 'EDIT PATIENT RECORD';
+    document.getElementById('patientModal').style.display = 'block';
+}
+
+function resetPatientForm() {
+    document.getElementById('biteForm').reset();
+    document.getElementById('outcome').value = 'INC';
+    editIndex = -1; editIncidentId = null; editPatientId = null; editTreatmentId = null; editScheduleId = null;
+    const btn = document.getElementById('submitBtn');
+    btn.innerText = 'Submit Record'; btn.style.background = '#000'; btn.disabled = false;
+}
+
+function renderInventory() {
+    const container = document.getElementById('inventoryBody');
+    container.innerHTML = '';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const warnMs = 30 * 86400000;
+    const active  = vaccineInventory.filter(function(b) { return parseInt(b.is_expired) === 0 && parseInt(b.qty) > 0; });
+    const expired = vaccineInventory.filter(function(b) { return parseInt(b.is_expired) === 1; });
+    if (active.length === 0 && expired.length === 0) { container.innerHTML = '<p class="inv-empty">No vaccine stock available.</p>'; return; }
+    let html = '<table class="inventory-grouped-table"><thead><tr><th>Batch</th><th>Qty</th><th>Date Stocked</th><th>Expiry</th><th>Price</th><th>Status</th></tr></thead><tbody>';
+    if (active.length > 0) {
+        const groups = {};
+        active.forEach(function(b) { if (!groups[b.name]) groups[b.name] = []; groups[b.name].push(b); });
+        Object.keys(groups).sort().forEach(function(brand) {
+            const batches = groups[brand].sort(function(a, b) { return new Date(a.expiry) - new Date(b.expiry); });
+            const totalQty = batches.reduce(function(s, b) { return s + parseInt(b.qty); }, 0);
+            const lowStock = totalQty < 10;
+            html += '<tr class="inventory-group-header"><td colspan="6"><span class="group-brand-name">' + brand + '</span><span class="group-total-qty">Total: ' + totalQty + ' doses</span>' + (lowStock ? '<span class="low-stock-badge">&#9888; LOW STOCK</span>' : '') + '</td></tr>';
+            batches.forEach(function(b, idx) {
+                const isFirst = idx === 0;
+                const expiringSoon = (new Date(b.expiry) - today) <= warnMs;
+                html += '<tr class="inventory-batch-row"><td class="batch-cell">' + (isFirst ? '<span class="fefo-icon">&#9658;</span>' : '<span class="fefo-spacer"></span>') + 'Batch ' + (idx+1) + '</td><td>' + b.qty + '</td><td>' + formatDate(b.dateStocked) + '</td><td class="' + (expiringSoon ? 'expiring-soon' : '') + '">' + formatDate(b.expiry) + (expiringSoon ? ' &#9888;' : '') + '</td><td>&#8369;' + b.price + '</td><td><span class="status-active-badge">ACTIVE</span></td></tr>';
+            });
+        });
+    }
+    if (expired.length > 0) {
+        html += '<tr class="inventory-expired-header"><td colspan="6">&#9888; EXPIRED BATCHES &mdash; For Monitoring Only</td></tr>';
+        const eg = {};
+        expired.forEach(function(b) { if (!eg[b.name]) eg[b.name] = []; eg[b.name].push(b); });
+        Object.keys(eg).sort().forEach(function(brand) {
+            const batches = eg[brand].sort(function(a, b) { return new Date(a.expiry) - new Date(b.expiry); });
+            html += '<tr class="inventory-group-header expired-group-header"><td colspan="6"><span class="group-brand-name">' + brand + '</span><span class="group-total-qty">Qty: ' + batches.reduce(function(s, b) { return s + parseInt(b.qty); }, 0) + ' doses (expired)</span></td></tr>';
+            batches.forEach(function(b, idx) {
+                html += '<tr class="inventory-batch-row inventory-expired-row"><td class="batch-cell"><span class="fefo-spacer"></span>Batch ' + (idx+1) + '</td><td>' + b.qty + '</td><td>' + formatDate(b.dateStocked) + '</td><td>' + formatDate(b.expiry) + '</td><td>&#8369;' + b.price + '</td><td><span class="expired-badge">EXPIRED</span></td></tr>';
+            });
+        });
+    }
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+function updateBrandOptions() {
+    const s = document.getElementById('brand');
+    const names = vaccineInventory.filter(function(v) { return parseInt(v.qty) > 0; }).map(function(x) { return x.name; });
+    const unique = names.filter(function(v, i, a) { return a.indexOf(v) === i; });
+    s.innerHTML = '<option value="">-- SELECT --</option>';
+    unique.forEach(function(bn) {
+        const first = vaccineInventory.find(function(v) { return v.name === bn && parseInt(v.qty) > 0; });
+        const opt = document.createElement('option');
+        opt.value = bn;
+        opt.setAttribute('data-price', first.price);
+        opt.textContent = bn;
+        s.appendChild(opt);
+    });
+}
+
+function updatePriceDisplay() {
+    const s = document.getElementById('brand');
+    const selected = s.options[s.selectedIndex];
+    const p = selected ? (selected.getAttribute('data-price') || '0') : '0';
+    document.getElementById('priceDisplay').value = '\u20b1' + p;
+}
+
+function updateInchargeOptions(list) {
+    const sel = document.getElementById('inchargeSelect');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">-- SELECT --</option>';
+    list.forEach(function(u) {
+        const opt = document.createElement('option');
+        opt.value = u.id;
+        opt.textContent = u.position;
+        if (u.id == cur) opt.selected = true;
+        sel.appendChild(opt);
+    });
+}
+
+function filterTable() {
+    const v = document.getElementById('searchBar').value.toUpperCase();
+    Array.from(document.getElementById('tableBody').rows).forEach(function(x) {
+        x.style.display = x.innerText.toUpperCase().includes(v) ? '' : 'none';
+    });
+}
+
+function printReceipt(i) {
+    const d = patientRecords[i];
+    const now = new Date();
+    document.getElementById('currentPrintDate').innerText = now.toLocaleDateString();
+    document.getElementById('receiptNumber').innerText    = String(i+1).padStart(6,'0');
+    document.getElementById('pName').innerText            = d.lName + ', ' + d.fName + ' ' + (d.mName || '');
+    document.getElementById('pDate').innerText            = formatDate(d.regDate);
+    document.getElementById('pBrand').innerText           = d.brand;
+    document.getElementById('pPrice').innerText           = '\u20b1' + (d.currentPrice || '0');
+    document.getElementById('pTotalPrice').innerText      = '\u20b1' + (d.currentPrice || '0');
+    document.getElementById('pRegisteredBy').innerText    = d.registeredBy || 'N/A';
+    document.getElementById('pIncharge').innerText        = d.inchargeDisplay || 'N/A';
+    document.getElementById('r0').innerText  = formatDate(d.d0) || 'N/A';
+    document.getElementById('r3').innerText  = (d.d3  && d.d3.trim()  !== '') ? formatDate(d.d3)  : calcExpected(d.d0, 3);
+    document.getElementById('r7').innerText  = (d.d7  && d.d7.trim()  !== '') ? formatDate(d.d7)  : calcExpected(d.d0, 7);
+    document.getElementById('r14').innerText = (d.d14 && d.d14.trim() !== '') ? formatDate(d.d14) : calcExpected(d.d0, 14);
+    document.getElementById('r28').innerText = (d.d28 && d.d28.trim() !== '') ? formatDate(d.d28) : calcExpected(d.d0, 28);
+    window.print();
+}
+
+function logoutUser() {
+    if (confirm('Logout?')) window.location.href = 'logout.php';
+}
+
+
+function openPatientModal() {
+    resetPatientForm();
+    document.getElementById('patientModal').style.display = 'block';
+}
+function closePatientModal() {
+    document.getElementById('patientModal').style.display = 'none';
+    resetPatientForm();
+}
+
+window.onload = init;
+</script>
+</body>
+</html>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animal Bite Center | Login</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:url('./images/dog.jpg') no-repeat center center fixed;background-size:cover;color:#1e293b;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;background:rgba(0,0,0,0.50);z-index:0;pointer-events:none;}
+
+/* NAVBAR */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:9999;height:86px;background:rgba(6,15,30,0.60);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.09);transition:background .3s,box-shadow .3s;}
+.navbar.scrolled{background:rgba(4,10,22,0.95);box-shadow:0 4px 28px rgba(0,0,0,0.55);}
+.nav-inner{max-width:1380px;margin:0 auto;padding:0 32px;height:100%;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.nav-brand{display:flex;align-items:center;text-decoration:none;flex-shrink:0;}
+.nav-brand-text{font-size:34px;font-weight:900;color:#fff;letter-spacing:-0.5px;white-space:nowrap;}
+.nav-brand-a{color:#e53e3e;font-weight:900;}
+.nav-brand-b{color:#22c55e;font-weight:900;}
+.nav-brand-c{color:#3b82f6;font-weight:900;}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;}
+.nav-link{position:relative;display:inline-block;padding:10px 18px;font-size:16px;font-weight:600;color:rgba(255,255,255,0.65);text-decoration:none;border-radius:8px;white-space:nowrap;transition:color .2s,background .2s;}
+.nav-link::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%) scaleX(0);width:55%;height:2px;background:#3b82f6;border-radius:2px;transition:transform .25s;}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,0.09);}
+.nav-link:hover::after,.nav-link.active::after{transform:translateX(-50%) scaleX(1);}
+.nav-link.active{color:#fff;background:rgba(255,255,255,0.07);}
+.nav-login-btn{background:#2563eb !important;color:#fff !important;border-radius:9px !important;padding:10px 26px !important;font-weight:700 !important;font-size:16px !important;box-shadow:0 3px 12px rgba(37,99,235,.45);}
+.nav-login-btn::after{display:none !important;}
+.nav-login-btn:hover{background:#1d4ed8 !important;transform:translateY(-1px) !important;}
+.nav-hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:40px;height:40px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:8px;cursor:pointer;flex-shrink:0;}
+.nav-hamburger span{display:block;width:20px;height:2px;background:#fff;border-radius:2px;transition:transform .3s,opacity .3s;}
+.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.nav-hamburger.open span:nth-child(2){opacity:0;}
+.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* HOME SECTION - full viewport */
+.home-section{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 24px 60px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.4;}}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.95);padding:6px 18px;background:rgba(4,15,35,0.85);border:1px solid rgba(255,255,255,0.20);border-radius:50px;margin-bottom:24px;animation:fadeUp .6s ease both;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+.hero-eyebrow-dot{width:7px;height:7px;background:#22c55e;border-radius:50%;animation:blink 2s infinite;}
+.hero-headline{font-size:clamp(38px,6vw,68px);font-weight:900;color:#fff;line-height:1.08;letter-spacing:-2px;margin-bottom:22px;max-width:800px;animation:fadeUp .7s .1s ease both;}
+.hero-headline em{font-style:normal;color:#60a5fa;}
+.hero-tagline{font-size:16px;color:rgba(255,255,255,0.92);line-height:1.75;max-width:560px;margin:0 auto 36px;animation:fadeUp .7s .2s ease both;text-shadow:0 2px 12px rgba(0,0,0,0.6);}
+.hero-stats{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:40px;animation:fadeUp .7s .3s ease both;}
+.hero-stat{display:flex;align-items:center;gap:10px;background:rgba(4,15,35,0.88);border:1px solid rgba(255,255,255,0.18);border-radius:12px;padding:12px 20px;box-shadow:0 8px 28px rgba(0,0,0,0.55);backdrop-filter:blur(10px);}
+.hero-stat:hover{background:rgba(6,20,50,0.95);transform:translateY(-2px);box-shadow:0 12px 36px rgba(0,0,0,0.65);transition:background .2s,transform .2s,box-shadow .2s;}
+.hero-stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hero-stat-icon svg{width:18px;height:18px;}
+.hero-stat-num{font-size:18px;font-weight:900;color:#fff;line-height:1;}
+.hero-stat-lbl{font-size:11px;color:rgba(255,255,255,.75);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.hero-actions{display:none;}
+.hero-details{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:10px;animation:fadeUp .7s .4s ease both;}
+.hero-detail-card{display:flex;flex-direction:column;align-items:center;gap:10px;background:rgba(4,15,35,0.88);border:1px solid rgba(255,255,255,0.18);border-radius:16px;padding:22px 24px;width:260px;transition:background .2s,transform .2s,box-shadow .2s;box-shadow:0 8px 32px rgba(0,0,0,0.55);backdrop-filter:blur(10px);}
+.hero-detail-card:hover{background:rgba(6,20,50,0.95);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,0.7);}
+.hero-detail-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hero-detail-icon svg{width:22px;height:22px;}
+.hero-detail-title{font-size:14px;font-weight:800;color:#fff;text-align:center;line-height:1.3;}
+.hero-detail-sub{font-size:12.5px;color:rgba(255,255,255,.80);text-align:center;line-height:1.65;}
+.hero-btn-primary{display:none;}
+.hero-btn-ghost{display:none;}
+@keyframes bobDown{0%,100%{transform:translateY(0);}50%{transform:translateY(6px);}}
+.scroll-hint{margin-top:52px;display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,1);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;animation:bobDown 2s ease-in-out infinite;}
+.scroll-hint svg{width:20px;height:20px;opacity:1;}
+
+/* LOGIN SECTION */
+.login-section{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;padding:72px 24px 80px;background:rgba(0,0,0,0.20);}
+.login-card{display:flex;width:100%;max-width:1300px;height:750px;background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.22);border-radius:36px;box-shadow:0 40px 100px rgba(0,0,0,0.55);overflow:hidden;backdrop-filter:blur(4px);}
+.card-left{flex:1.7;position:relative;overflow:hidden;}
+.logo-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;background:#fff;border-radius:120px;padding:32px 72px;box-shadow:0 16px 48px rgba(0,0,0,0.35);}
+.logo-img{width:280px;display:block;}
+.spiral-item{position:absolute;z-index:5;animation:floatUp 6s ease-in-out infinite;}
+.spiral-image{width:200px;height:200px;object-fit:cover;border-radius:18px;border:3px solid rgba(0,0,0,0.85);box-shadow:0 16px 40px rgba(0,0,0,0.45);display:block;transition:transform .3s;}
+.spiral-item:hover .spiral-image{transform:scale(1.06) rotate(1.5deg);border-color:#2563eb;}
+@keyframes floatUp{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+.card-right{flex:0.75;background:#fff;border-radius:28px;margin:22px;padding:52px 44px;display:flex;flex-direction:column;justify-content:center;box-shadow:0 8px 32px rgba(0,0,0,0.12);}
+.form-title{font-size:34px;font-weight:900;color:#1e293b;margin-bottom:6px;letter-spacing:-0.5px;}
+.form-sub{color:#64748b;font-size:14px;margin-bottom:32px;font-weight:500;}
+.field-group{margin-bottom:20px;}
+.field-group label{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#334155;margin-bottom:8px;}
+.field-wrap{position:relative;display:flex;align-items:center;}
+.field-wrap input{width:100%;padding:14px 48px 14px 18px;border:2px solid #f1f5f9;border-radius:12px;background:#f8fafc;font-size:14px;font-family:inherit;color:#1e293b;transition:border-color .25s,background .25s,box-shadow .25s;outline:none;}
+.field-wrap input:focus{border-color:#2563eb;background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.10);}
+.field-wrap input::placeholder{color:#94a3b8;}
+.field-icon{position:absolute;right:16px;display:flex;align-items:center;pointer-events:none;opacity:.35;transition:opacity .2s;}
+.field-wrap:focus-within .field-icon{opacity:.7;}
+.form-extras{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;font-size:13px;}
+.remember-label{display:flex;align-items:center;gap:8px;color:#64748b;cursor:pointer;font-weight:500;}
+.remember-label input[type="checkbox"]{accent-color:#2563eb;}
+.forgot-link{color:#2563eb;text-decoration:none;font-weight:700;}
+.forgot-link:hover{color:#1d4ed8;}
+.btn-login{width:100%;padding:17px;background:#2563eb;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:.3px;transition:background .2s,transform .2s,box-shadow .2s;display:flex;align-items:center;justify-content:center;min-height:54px;box-shadow:0 4px 16px rgba(37,99,235,.35);}
+.btn-login:hover:not(:disabled){background:#1d4ed8;transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,.45);}
+.btn-login:disabled{opacity:.7;cursor:not-allowed;}
+.btn-loader{width:22px;height:22px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;display:none;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.form-footer{text-align:center;color:#94a3b8;font-size:12px;margin-top:20px;}
+
+/* SHARED LP SECTIONS */
+.lp-section{position:relative;z-index:1;padding:90px 40px;}
+.about-section{background:linear-gradient(180deg,#071830 0%,#0d2a4e 100%);}
+.services-section{background:linear-gradient(180deg,#091b35 0%,#071525 100%);}
+.schedule-section{background:linear-gradient(180deg,#060f1e 0%,#0a1e38 100%);}
+.lp-inner{max-width:1200px;margin:0 auto;}
+.lp-label{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#60a5fa;margin-bottom:14px;}
+.lp-label-dot{width:6px;height:6px;background:#3b82f6;border-radius:50%;}
+.lp-heading{font-size:clamp(26px,3.5vw,42px);font-weight:900;color:#fff;letter-spacing:-.8px;margin-bottom:12px;line-height:1.15;}
+.lp-accent{color:#60a5fa;}
+.lp-subhead{color:rgba(255,255,255,.52);font-size:15px;margin-bottom:50px;line-height:1.65;}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;margin-top:40px;}
+.about-lead{font-size:18px;font-weight:700;color:#e2e8f0;line-height:1.65;margin-bottom:18px;}
+.about-body{font-size:14.5px;color:rgba(255,255,255,.55);line-height:1.82;margin-bottom:16px;}
+.about-stats{display:flex;gap:28px;margin-top:32px;padding-top:28px;border-top:1px solid rgba(255,255,255,.08);}
+.stat-block{display:flex;flex-direction:column;gap:4px;}
+.stat-num{font-size:28px;font-weight:900;color:#60a5fa;letter-spacing:-1px;}
+.stat-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);}
+.about-img-frame{position:relative;}
+.about-img{width:100%;height:420px;object-fit:cover;border-radius:20px;display:block;box-shadow:0 30px 70px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);}
+.about-img-badge{position:absolute;bottom:-14px;left:24px;background:#fff;color:#1e293b;font-size:12px;font-weight:800;padding:10px 18px;border-radius:50px;display:flex;align-items:center;gap:7px;box-shadow:0 8px 28px rgba(0,0,0,.25);}
+.about-img-badge svg{width:15px;height:15px;stroke:#16a34a;}
+
+/* SERVICES */
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+.svc-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:20px;padding:30px 26px;transition:transform .25s,box-shadow .25s,background .25s,border-color .25s;}
+.svc-card:hover{transform:translateY(-6px);background:rgba(255,255,255,.09);border-color:rgba(96,165,250,.28);box-shadow:0 24px 56px rgba(0,0,0,.35);}
+.svc-icon-wrap{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 6px 20px rgba(0,0,0,.25);}
+.svc-icon-wrap svg{width:24px;height:24px;}
+.svc-title{font-size:16px;font-weight:800;color:#f1f5f9;margin-bottom:10px;letter-spacing:-.2px;}
+.svc-desc{font-size:13.5px;color:rgba(255,255,255,.5);line-height:1.72;margin-bottom:16px;}
+.svc-tag{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:4px 12px;background:rgba(59,130,246,.14);color:#93c5fd;border:1px solid rgba(59,130,246,.24);border-radius:50px;}
+
+/* SCHEDULE */
+.schedule-layout{display:grid;grid-template-columns:1fr 360px;gap:40px;align-items:start;}
+.schedule-table-wrap{border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.08);}
+.schedule-table{width:100%;border-collapse:collapse;font-size:14px;}
+.schedule-table thead tr{background:rgba(37,99,235,.22);}
+.schedule-table th{padding:14px 18px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#93c5fd;}
+.schedule-table tbody tr{border-top:1px solid rgba(255,255,255,.05);transition:background .18s;}
+.schedule-table tbody tr:hover{background:rgba(255,255,255,.04);}
+.schedule-table td{padding:14px 18px;color:rgba(255,255,255,.72);vertical-align:middle;}
+.day-name{font-weight:700;color:#e2e8f0;}
+.closed-td{color:rgba(255,255,255,.25)!important;font-style:italic;}
+.status-badge{display:inline-block;padding:3px 12px;border-radius:50px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.status-badge.open{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.25);}
+.status-badge.half{background:rgba(251,191,36,.14);color:#fcd34d;border:1px solid rgba(251,191,36,.24);}
+.status-badge.closed{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.2);}
+.schedule-info-col{display:flex;flex-direction:column;gap:16px;}
+.schedule-note{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;border-radius:16px;border:1px solid rgba(255,255,255,.07);}
+.note-emergency{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.18)!important;}
+.note-reminder{background:rgba(251,191,36,.07);border-color:rgba(251,191,36,.18)!important;}
+.note-info{background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.18)!important;}
+.sched-note-icon{flex-shrink:0;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;}
+.sched-note-icon svg{width:18px;height:18px;}
+.note-emergency .sched-note-icon{color:#f87171;}
+.note-reminder .sched-note-icon{color:#fbbf24;}
+.note-info .sched-note-icon{color:#60a5fa;}
+.schedule-note h4{font-size:13px;font-weight:800;color:#e2e8f0;margin-bottom:5px;}
+.schedule-note p{font-size:13px;color:rgba(255,255,255,.52);line-height:1.65;}
+.schedule-note p strong{color:rgba(255,255,255,.82);}
+
+/* CONTACT */
+.contact-section{position:relative;z-index:1;}
+.contact-header{background:linear-gradient(135deg,#0c2340 0%,#0f3d6b 50%,#0c2340 100%);padding:64px 40px 48px;text-align:center;position:relative;overflow:hidden;}
+.contact-header::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(37,99,235,.18) 0%,transparent 70%),radial-gradient(ellipse at 70% 50%,rgba(14,165,233,.12) 0%,transparent 70%);pointer-events:none;}
+.contact-header-inner{position:relative;z-index:1;}
+.contact-eyebrow{display:inline-block;background:rgba(37,99,235,.25);border:1px solid rgba(96,165,250,.4);color:#93c5fd;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;padding:6px 18px;border-radius:50px;margin-bottom:16px;}
+.contact-title{font-size:42px;font-weight:900;color:#fff;margin-bottom:12px;letter-spacing:-.5px;}
+.contact-desc{color:rgba(255,255,255,.6);font-size:15px;max-width:480px;margin:0 auto;line-height:1.7;}
+.contact-body{background:linear-gradient(180deg,#0f3d6b 0%,#102a4a 100%);padding:0 40px 48px;}
+.contact-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;max-width:1100px;margin:0 auto;}
+.contact-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:18px;overflow:hidden;transition:transform .25s,box-shadow .25s,background .25s;backdrop-filter:blur(8px);}
+.contact-card:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(0,0,0,.35);background:rgba(255,255,255,.10);}
+.ccard-top{height:80px;display:flex;align-items:center;justify-content:center;}
+.ccard-top svg{width:32px;height:32px;}
+.ccard-body{padding:20px 22px 24px;}
+.ccard-body h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.5);margin-bottom:8px;}
+.ccard-body p{color:#fff;font-size:14px;line-height:1.65;font-weight:500;}
+.badge-avail,.badge-reply{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;}
+.badge-avail{background:rgba(34,197,94,.2);color:#86efac;border:1px solid rgba(34,197,94,.3);}
+.badge-reply{background:rgba(251,191,36,.15);color:#fcd34d;border:1px solid rgba(251,191,36,.25);}
+.map-container{background:#102a4a;border-top:1px solid rgba(255,255,255,.08);}
+.map-container iframe{display:block;}
+
+/* FOOTER */
+.site-footer{position:relative;z-index:1;background:#040c18;border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;text-align:center;}
+.footer-copy{color:rgba(255,255,255,.35);font-size:13px;}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .contact-grid{grid-template-columns:repeat(2,1fr);}
+  .services-grid{grid-template-columns:repeat(2,1fr);}
+  .about-grid{grid-template-columns:1fr;gap:40px;}
+  .about-img-col{order:-1;}
+  .about-img{height:300px;}
+  .schedule-layout{grid-template-columns:1fr;}
+}
+@media(max-width:900px){
+  .nav-hamburger{display:flex;}
+  .nav-links{display:none;position:absolute;top:86px;left:0;right:0;background:rgba(4,10,22,.97);backdrop-filter:blur(20px);flex-direction:column;padding:16px 20px 24px;border-bottom:1px solid rgba(255,255,255,.08);gap:4px;}
+  .nav-links.nav-open{display:flex;}
+  .nav-link{width:100%;padding:12px 16px;}
+  .nav-login-btn{margin-top:8px;text-align:center;}
+  .card-left{display:none;}
+  .login-card{max-width:480px;height:auto;}
+  .card-right{margin:0;border-radius:36px;padding:48px 36px;}
+}
+@media(max-width:768px){
+  .lp-section{padding:64px 24px;}
+  .services-grid{grid-template-columns:1fr;}
+  .hero-stats{flex-direction:column;align-items:center;}
+}
+@media(max-width:600px){
+  .login-card{border-radius:24px;}
+  .card-right{padding:36px 24px;}
+  .form-title{font-size:28px;}
+  .contact-header{padding:48px 20px 36px;}
+  .contact-title{font-size:30px;}
+  .contact-body{padding:0 20px 36px;}
+  .contact-grid{grid-template-columns:1fr 1fr;gap:14px;}
+  .schedule-table td,.schedule-table th{padding:10px 12px;font-size:12px;}
+  .home-section{padding:90px 20px 50px;}
+}
+@media(max-width:420px){.contact-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#home" onclick="goTo('home');return false;">
+      <span class="nav-brand-text"><span class="nav-brand-a">A</span>nimal&nbsp;<span class="nav-brand-b">B</span>ite&nbsp;<span class="nav-brand-c">C</span>enter</span>
+    </a>
+    <button class="nav-hamburger" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home"     class="nav-link active" id="nl-home"     onclick="goTo('home');    return false;">Home</a></li>
+      <li><a href="#about"    class="nav-link"        id="nl-about"    onclick="goTo('about');   return false;">About</a></li>
+      <li><a href="#services" class="nav-link"        id="nl-services" onclick="goTo('services');return false;">Services</a></li>
+      <li><a href="#schedule" class="nav-link"        id="nl-schedule" onclick="goTo('schedule');return false;">Schedule</a></li>
+      <li><a href="#contact"  class="nav-link"        id="nl-contact"  onclick="goTo('contact'); return false;">Contact Us</a></li>
+      <li><a href="#login"    class="nav-link nav-login-btn" id="nl-login" onclick="goTo('login');return false;">Log In</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HOME SECTION — full viewport, no overlap -->
+<section class="home-section" id="home">
+  <span class="hero-eyebrow">
+    <span class="hero-eyebrow-dot"></span>
+    Cagayan de Oro City &nbsp;·&nbsp; Carmen &nbsp;·&nbsp; DOH Accredited
+  </span>
+  <h1 class="hero-headline">Fast. Reliable.<br><em>Life-Saving</em> Care.</h1>
+  <p class="hero-tagline">Immediate response for animal bite injuries, rabies prevention &amp; post-exposure prophylaxis — available when you need it most.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-icon" style="background:rgba(34,197,94,.15);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      </div>
+      <div><div class="hero-stat-num">24/7</div><div class="hero-stat-lbl">Emergency Care</div></div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-icon" style="background:rgba(59,130,246,.15);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <div><div class="hero-stat-num">DOH</div><div class="hero-stat-lbl">Accredited</div></div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-icon" style="background:rgba(251,191,36,.15);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+      </div>
+      <div><div class="hero-stat-num">PEP</div><div class="hero-stat-lbl">Certified</div></div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-icon" style="background:rgba(239,68,68,.15);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div><div class="hero-stat-num">Expert</div><div class="hero-stat-lbl">Medical Team</div></div>
+    </div>
+  </div>
+  <div class="hero-details">
+    <div class="hero-detail-card">
+      <div class="hero-detail-icon" style="background:rgba(239,68,68,.18);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+      </div>
+      <div class="hero-detail-title">What is Rabies?</div>
+      <div class="hero-detail-sub">A deadly virus spread through the bite or scratch of an infected animal — most commonly dogs. Once symptoms appear, it is almost always fatal. That is why immediate treatment after a bite is critical.</div>
+    </div>
+    <div class="hero-detail-card">
+      <div class="hero-detail-icon" style="background:rgba(59,130,246,.18);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="hero-detail-title">Who We Are</div>
+      <div class="hero-detail-sub">The Animal Bite Center is a DOH-accredited facility dedicated to treating people bitten by animals suspected of carrying rabies. We provide immediate medical care, proper wound management, and the complete anti-rabies vaccination series to prevent the virus from taking hold.</div>
+    </div>
+    <div class="hero-detail-card">
+      <div class="hero-detail-icon" style="background:rgba(34,197,94,.18);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <div class="hero-detail-title">Why Come to Us?</div>
+      <div class="hero-detail-sub">Rabies is 100% preventable if treated early. Our center acts fast — we assess the wound, wash and dress the bite, administer anti-rabies vaccines, and guide every patient through their full PEP schedule so no dose is ever missed.</div>
+    </div>
+    <div class="hero-detail-card">
+      <div class="hero-detail-icon" style="background:rgba(251,191,36,.15);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      </div>
+      <div class="hero-detail-title">Act Within 24 Hours</div>
+      <div class="hero-detail-sub">If you or someone you know has been bitten by a dog, cat, or any wild animal — do not wait. Wash the wound immediately with soap and water, then come to us right away. Time is the most important factor in preventing rabies.</div>
+    </div>
+  </div>
+  <div class="scroll-hint" style="margin-top:32px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    Scroll to explore
+  </div>
+</section>
+
+<!-- LOGIN SECTION — own separate section below home -->
+<section class="login-section" id="login">
+  <div class="login-card">
+    <div class="card-left">
+      <div class="logo-center">
+        <img src="./images/Animal-removebg-preview.png" alt="ABC Logo" class="logo-img">
+      </div>
+      <div class="spiral-item" style="top:4%;left:28%;animation-delay:0s;"><img src="./images/dog6.jpg" class="spiral-image" alt=""></div>
+      <div class="spiral-item" style="top:5%;left:55%;animation-delay:1.5s;"><img src="./images/dog10.jpg" class="spiral-image" alt=""></div>
+      <div class="spiral-item" style="top:38%;left:3%;animation-delay:0.5s;"><img src="./images/dog2.jpg" class="spiral-image" alt=""></div>
+      <div class="spiral-item" style="top:38%;left:68%;animation-delay:2s;"><img src="./images/dog5.jpg" class="spiral-image" alt=""></div>
+      <div class="spiral-item" style="top:72%;left:22%;animation-delay:1s;"><img src="./images/dog3.jpg" class="spiral-image" alt=""></div>
+      <div class="spiral-item" style="top:70%;left:55%;animation-delay:2.5s;"><img src="./images/dog4.jpg" class="spiral-image" alt=""></div>
+    </div>
+    <div class="card-right">
+      <h2 class="form-title">Account Login</h2>
+      <p class="form-sub">BiteCare Management System</p>
+      <form id="loginForm">
+        <div class="field-group">
+          <label for="username">Username</label>
+          <div class="field-wrap">
+            <input type="text" id="username" placeholder="Enter username" required autocomplete="username">
+            <div class="field-icon"><img src="./images/user.png" alt="" width="18"></div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="password">Password</label>
+          <div class="field-wrap">
+            <input type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
+            <div class="field-icon"><img src="./images/lock.png" alt="" width="18"></div>
+          </div>
+        </div>
+        <div id="loginError" style="display:none;color:#ca0717;font-size:13px;font-weight:700;margin-bottom:12px;padding:10px 14px;background:#fff0f0;border:1.5px solid #ca0717;border-radius:8px;"></div>
+        <div class="form-extras">
+          <label class="remember-label"><input type="checkbox" id="rememberMe"> Remember me</label>
+          <a href="#" class="forgot-link">Forgot Password?</a>
+        </div>
+        <button type="submit" class="btn-login" id="loginBtn">
+          <span id="btnText">Log in</span>
+          <div class="btn-loader" id="btnLoader"></div>
+        </button>
+      </form>
+      <p class="form-footer">© 2026 Animal Bite Center System</p>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="lp-section about-section" id="about">
+  <div class="lp-inner">
+    <div class="lp-label"><span class="lp-label-dot"></span>Who We Are</div>
+    <h2 class="lp-heading">Committed to Your <span class="lp-accent">Recovery &amp; Safety</span></h2>
+    <div class="about-grid">
+      <div class="about-text-col">
+        <p class="about-lead">The Animal Bite Center provides fast and reliable care for bite injuries, rabies prevention, and health consultations for the people of Cagayan de Oro City.</p>
+        <p class="about-body">Our dedicated medical team responds swiftly to animal bite emergencies with evidence-based post-exposure prophylaxis (PEP) protocols. We are equipped with licensed vaccines, trained professionals, and a streamlined digital records system to ensure no patient is missed.</p>
+        <p class="about-body">Licensed under the Department of Health (DOH), we follow the National Rabies Prevention and Control Program guidelines to deliver safe, effective, and affordable treatment to our community.</p>
+        <div class="about-stats">
+          <div class="stat-block"><span class="stat-num">24/7</span><span class="stat-lbl">Emergency Response</span></div>
+          <div class="stat-block"><span class="stat-num">DOH</span><span class="stat-lbl">Licensed Facility</span></div>
+          <div class="stat-block"><span class="stat-num">PEP</span><span class="stat-lbl">Certified Protocols</span></div>
+        </div>
+      </div>
+      <div class="about-img-col">
+        <div class="about-img-frame">
+          <img src="./images/dog1.jpg" alt="Animal Bite Center" class="about-img">
+          <div class="about-img-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            DOH Accredited Facility
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="lp-section services-section" id="services">
+  <div class="lp-inner">
+    <div class="lp-label"><span class="lp-label-dot"></span>What We Offer</div>
+    <h2 class="lp-heading">Our <span class="lp-accent">Medical Services</span></h2>
+    <p class="lp-subhead">Comprehensive care from the moment of injury through full recovery.</p>
+    <div class="services-grid">
+      <div class="svc-card">
+        <div class="svc-icon-wrap" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+        <h3 class="svc-title">Anti-Rabies Vaccination</h3>
+        <p class="svc-desc">Complete PEP vaccination series using WHO-approved vaccines on the standard Day 0, 3, 7, 14, and 28 schedule.</p>
+        <span class="svc-tag">Intradermal &amp; Intramuscular</span>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon-wrap" style="background:linear-gradient(135deg,#15803d,#22c55e);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3 class="svc-title">Wound Care &amp; Cleansing</h3>
+        <p class="svc-desc">Immediate wound washing, antiseptic treatment, and dressing to minimize infection and rabies transmission risk.</p>
+        <span class="svc-tag">Emergency Response</span>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon-wrap" style="background:linear-gradient(135deg,#b45309,#f59e0b);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg></div>
+        <h3 class="svc-title">RIG Administration</h3>
+        <p class="svc-desc">Rabies Immunoglobulin (RIG) for Category III exposures, providing immediate passive immunity before the vaccine takes effect.</p>
+        <span class="svc-tag">Category III Treatment</span>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon-wrap" style="background:linear-gradient(135deg,#5b21b6,#8b5cf6);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3 class="svc-title">Medical Consultation</h3>
+        <p class="svc-desc">Professional assessment by licensed physicians for bite categorization, wound severity, and full treatment planning.</p>
+        <span class="svc-tag">Licensed Physicians</span>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon-wrap" style="background:linear-gradient(135deg,#0e7490,#06b6d4);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+        <h3 class="svc-title">Patient Records</h3>
+        <p class="svc-desc">Digital tracking of vaccination schedules, treatment history, and follow-up appointments via the BiteCare system.</p>
+        <span class="svc-tag">DOH Compliant</span>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon-wrap" style="background:linear-gradient(135deg,#be123c,#f43f5e);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+        <h3 class="svc-title">Follow-Up Monitoring</h3>
+        <p class="svc-desc">Scheduled follow-up visits and outcome tracking to ensure full completion of the vaccination series and recovery.</p>
+        <span class="svc-tag">Ongoing Support</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCHEDULE -->
+<section class="lp-section schedule-section" id="schedule">
+  <div class="lp-inner">
+    <div class="lp-label"><span class="lp-label-dot"></span>When to Visit</div>
+    <h2 class="lp-heading">Clinic <span class="lp-accent">Operating Hours</span></h2>
+    <p class="lp-subhead">Walk-ins are welcome. Emergency cases are attended to at any time.</p>
+    <div class="schedule-layout">
+      <div class="schedule-table-wrap">
+        <table class="schedule-table">
+          <thead><tr><th>Day</th><th>Morning</th><th>Afternoon</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><span class="day-name">Monday</span></td><td>7:00 AM – 12:00 PM</td><td>1:00 PM – 5:00 PM</td><td><span class="status-badge open">Open</span></td></tr>
+            <tr><td><span class="day-name">Tuesday</span></td><td>7:00 AM – 12:00 PM</td><td>1:00 PM – 5:00 PM</td><td><span class="status-badge open">Open</span></td></tr>
+            <tr><td><span class="day-name">Wednesday</span></td><td>7:00 AM – 12:00 PM</td><td>1:00 PM – 5:00 PM</td><td><span class="status-badge open">Open</span></td></tr>
+            <tr><td><span class="day-name">Thursday</span></td><td>7:00 AM – 12:00 PM</td><td>1:00 PM – 5:00 PM</td><td><span class="status-badge open">Open</span></td></tr>
+            <tr><td><span class="day-name">Friday</span></td><td>7:00 AM – 12:00 PM</td><td>1:00 PM – 5:00 PM</td><td><span class="status-badge open">Open</span></td></tr>
+            <tr><td><span class="day-name">Saturday</span></td><td>7:00 AM – 12:00 PM</td><td>1:00 PM – 3:00 PM</td><td><span class="status-badge open">Open</span></td></tr>
+            <tr><td><span class="day-name">Sunday</span></td><td class="closed-td">Closed</td><td class="closed-td">Closed</td><td><span class="status-badge closed">Closed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="schedule-info-col">
+        <div class="schedule-note note-emergency">
+          <div class="sched-note-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+          <div><h4>Emergency Cases</h4><p>Bite emergencies are attended to <strong>24 hours a day, 7 days a week.</strong> Do not delay treatment.</p></div>
+        </div>
+        <div class="schedule-note note-reminder">
+          <div class="sched-note-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          <div><h4>What to Bring</h4><p>Valid ID, vaccination card (if available), and information about the animal that caused the bite.</p></div>
+        </div>
+        <div class="schedule-note note-info">
+          <div class="sched-note-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.4 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 6.29 6.29l.97-.97a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+          <div><h4>Emergency Hotline</h4><p>Call us anytime: <strong>0912-345-6789</strong></p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="contact-header">
+    <div class="contact-header-inner">
+      <span class="contact-eyebrow">Get In Touch</span>
+      <h2 class="contact-title">Contact Us</h2>
+      <p class="contact-desc">We are here to help you 24/7. Reach us through any of the channels below.</p>
+    </div>
+  </div>
+  <div class="contact-body">
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="ccard-top" style="background:linear-gradient(135deg,#0369a1,#0ea5e9);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div class="ccard-body"><h4>Address</h4><p>Animal Bite Treatment Center<br>Carmen, Cagayan de Oro City, PH</p></div>
+      </div>
+      <div class="contact-card">
+        <div class="ccard-top" style="background:linear-gradient(135deg,#15803d,#22c55e);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.4 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 6.29 6.29l.97-.97a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+        <div class="ccard-body"><h4>Phone</h4><p>0912-345-6789<br><span class="badge-avail">Available 24/7</span></p></div>
+      </div>
+      <div class="contact-card">
+        <div class="ccard-top" style="background:linear-gradient(135deg,#b45309,#f59e0b);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div class="ccard-body"><h4>Email</h4><p>abtc@example.com<br><span class="badge-reply">Replies within 24hrs</span></p></div>
+      </div>
+      <div class="contact-card">
+        <div class="ccard-top" style="background:linear-gradient(135deg,#5b21b6,#8b5cf6);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div>
+        <div class="ccard-body"><h4>Facebook</h4><p>fb.com/<br>AnimalBiteCenter</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="map-container">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019506993693!2d124.63520265877906!3d8.482120048867536!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32fff30079b6b5b7%3A0x9ac75df48f1a3e97!2sAnimal%20Bite%20Center!5e0!3m2!1sen!2sph!4v1772272515062!5m2!1sen!2sph" width="100%" height="420" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <p class="footer-copy">© 2026 Animal Bite Center — BiteCare Management System &nbsp;|&nbsp; Carmen, Cagayan de Oro City, PH</p>
+</footer>
+
+<script>
+/* LOGIN — original untouched */
+var loginForm=document.getElementById('loginForm');
+var loginBtn=document.getElementById('loginBtn');
+var btnText=document.getElementById('btnText');
+var btnLoader=document.getElementById('btnLoader');
+var loginError=document.getElementById('loginError');
+function showError(msg){loginError.textContent=msg;loginError.style.display='block';}
+function hideError(){loginError.style.display='none';}
+function setLoading(on){btnText.style.display=on?'none':'block';btnLoader.style.display=on?'block':'none';loginBtn.disabled=on;}
+loginForm.addEventListener('submit',async function(e){
+  e.preventDefault();hideError();
+  var u=document.getElementById('username').value.trim();
+  var p=document.getElementById('password').value.trim();
+  if(!u||!p){showError('Please enter both username and password.');return;}
+  setLoading(true);
+  try{
+    var res=await fetch('login.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    var r=await res.json();
+    if(r.success){
+      sessionStorage.setItem('userRole',r.role);
+      sessionStorage.setItem('loggedInPosition',r.position);
+      sessionStorage.setItem('loggedInName',r.name);
+      if(document.getElementById('rememberMe').checked){localStorage.setItem('savedUsername',u);}
+      else{localStorage.removeItem('savedUsername');}
+      window.location.href=r.redirect;
+    }else{showError(r.message||'Invalid username or password.');setLoading(false);}
+  }catch(err){showError('Connection error. Please try again.');setLoading(false);}
+});
+window.addEventListener('load',function(){
+  var s=localStorage.getItem('savedUsername');
+  if(s){document.getElementById('username').value=s;document.getElementById('rememberMe').checked=true;}
+});
+
+/* NAVIGATION */
+function goTo(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  var nav=document.getElementById('navbar');
+  var top=el.getBoundingClientRect().top+window.pageYOffset-nav.offsetHeight;
+  window.scrollTo({top:top,behavior:'smooth'});
+  document.getElementById('navLinks').classList.remove('nav-open');
+  document.getElementById('navToggle').classList.remove('open');
+  setActive(id);
+}
+function setActive(id){
+  ['home','about','services','schedule','contact','login'].forEach(function(k){
+    var el=document.getElementById('nl-'+k);
+    if(el)el.classList.remove('active');
+  });
+  var t=document.getElementById('nl-'+id);
+  if(t)t.classList.add('active');
+}
+document.getElementById('navToggle').addEventListener('click',function(){
+  this.classList.toggle('open');
+  document.getElementById('navLinks').classList.toggle('nav-open');
+});
+window.addEventListener('scroll',function(){
+  var nav=document.getElementById('navbar');
+  nav.classList.toggle('scrolled',window.scrollY>20);
+  var navH=nav.offsetHeight;
+  var mid=window.scrollY+navH+100;
+  var secs=['home','login','about','services','schedule','contact'];
+  var cur='home';
+  secs.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&el.offsetTop<=mid)cur=id;
+  });
+  setActive(cur);
+});
+</script>
+</body>
+</html>
